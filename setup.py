@@ -1,0 +1,12 @@
+from setuptools import setup, find_packages
+
+setup(
+    name='fastai_object_detection',
+    version='0.0.1',
+    url='https://github.com/rbrtwlz/fastai_object_detection.git',
+    author='Robert Walz',
+    author_email='abitdevelopment@gmail.com',
+    description='fastai extension for object detection',
+    packages=find_packages(),    
+    install_requires=['fastai', 'mean_average_precision']
+)
