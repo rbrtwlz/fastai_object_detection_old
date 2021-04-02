@@ -47,13 +47,6 @@ class AvgMetric_Copy(Metric):
     @property
     def name(self):  return self.func.func.__name__ if hasattr(self.func, 'func') else  self.func.__name__
     
-"""
-@patch
-def accumulate(x:AvgMetric, learn):
-    bs = len(learn.yb[0])
-    x.total += learn.to_detach(x.func(learn.pred, *learn.yb))*bs
-    x.count += bs
-"""    
     
-mAP_at_IoU40 = AvgMetric_Copy(partial(m_ap_metric, iou_thresholds=0.4))
-mAP_at_IoU90 = AvgMetric_Copy(partial(m_ap_metric, iou_thresholds=0.9))
+mAP_at_IoU40 = AvgMetric_Copy(partial(m_ap_metric, iou_thresholds=0.4).func.__name__="mAP@IoU>0.4")
+mAP_at_IoU90 = AvgMetric_Copy(partial(m_ap_metric, iou_thresholds=0.9).func.__name__="mAP@IoU>0.9")
