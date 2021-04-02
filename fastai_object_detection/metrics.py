@@ -1,6 +1,6 @@
 
-#from mean_average_precision import MetricBuilder
-from mean_average_precision import MeanAveragePrecision
+from mean_average_precision import MetricBuilder
+#from mean_average_precision import MeanAveragePrecision
 #from fastai.metrics import AvgMetric
 from fastai.metrics import Metric
 from fastai.torch_basics import *
@@ -42,8 +42,8 @@ class mAP_Metric():
         self.iou_thresholds = iou_thresholds
         
     def __call__(self, preds, targs, num_classes):
-        #metric_fn = MetricBuilder.build_evaluation_metric("map_2d", async_mode=True, num_classes=num_classes)
-        metric_fn = MeanAveragePrecision(num_classes)
+        metric_fn = MetricBuilder.build_evaluation_metric("map_2d", async_mode=True, num_classes=num_classes)
+        #metric_fn = MeanAveragePrecision(num_classes)
         for sample_preds, sample_targs in self.create_metric_samples(preds, targs):
             metric_fn.add(sample_preds, sample_targs)
         metric_batch = metric_fn.value(iou_thresholds=self.iou_thresholds)['mAP']
