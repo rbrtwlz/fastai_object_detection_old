@@ -30,17 +30,30 @@ def m_ap_metric(preds, targs, iou_thresholds=0.4):
     metric_batch =  metric_fn.value(iou_thresholds=iou_thresholds)['mAP']
     return metric_batch
 
-
+class AvgMetric_Copy(Metric):
+    "Average the values of `func` taking into account potential different batch sizes"
+    def __init__(self, func):  self.func = func
+    def reset(self):           self.total,self.count = 0.,0
+    def accumulate(self, learn):
+        bs = len(learn.yb)
+        self.total += learn.to_detach(self.func(learn.pred, *learn.yb))*bs
+        self.count += bs
+    @property
+    def value(self): return self.total/self.count if self.count != 0 else None
+    @property
+    def name(self):  return self.func.func.__name__ if hasattr(self.func, 'func') else  self.func.__name__
+    
+"""
 @patch
 def accumulate(x:AvgMetric, learn):
     bs = len(learn.yb[0])
     x.total += learn.to_detach(x.func(learn.pred, *learn.yb))*bs
     x.count += bs
+"""    
     
-    
-mAP_at_IoU40 = AvgMetric(m_ap_metric)
-mAP_at_IoU50 = AvgMetric(partial(m_ap_metric, iou_thresholds=0.5))
-mAP_at_IoU60 = AvgMetric(partial(m_ap_metric, iou_thresholds=0.6))
-mAP_at_IoU70 = AvgMetric(partial(m_ap_metric, iou_thresholds=0.7))
-mAP_at_IoU80 = AvgMetric(partial(m_ap_metric, iou_thresholds=0.8))
-mAP_at_IoU90 = AvgMetric(partial(m_ap_metric, iou_thresholds=0.9))
+mAP_at_IoU40 = AvgMetric_Copy(m_ap_metric)
+mAP_at_IoU50 = AvgMetric_Copy(partial(m_ap_metric, iou_thresholds=0.5))
+mAP_at_IoU60 = AvgMetric_Copy(partial(m_ap_metric, iou_thresholds=0.6))
+mAP_at_IoU70 = AvgMetric_Copy(partial(m_ap_metric, iou_thresholds=0.7))
+mAP_at_IoU80 = AvgMetric_Copy(partial(m_ap_metric, iou_thresholds=0.8))
+mAP_at_IoU90 = AvgMetric_Copy(partial(m_ap_metric, iou_thresholds=0.9))
