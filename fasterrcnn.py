@@ -2,9 +2,11 @@ from torchvision.models.detection.backbone_utils import resnet_fpn_backbone
 from torchvision.models.detection.anchor_utils import AnchorGenerator
 from torchvision.models.detection import FasterRCNN
 
-def get_FasterRCNN(arch_str, num_classes, **kwargs):
+__all__ = ['fasterrcnn_resnet18', 'fasterrcnn_resnet34', 'fasterrcnn_resnet50', 'fasterrcnn_resnet101', 'fasterrcnn_resnet152']
+
+def get_FasterRCNN(arch_str, num_classes, pretrained=True, **kwargs):
     
-    backbone = resnet_fpn_backbone(arch_str, pretrained=True, trainable_layers=5)
+    backbone = resnet_fpn_backbone(arch_str, pretrained=pretrained, trainable_layers=5)
     
     anchor_sizes = ((16,), (32,), (64,), (128,), (256,),)
     aspect_ratios = ((0.5, 1.0, 2.0),) * len(anchor_sizes)
@@ -21,3 +23,11 @@ def get_FasterRCNN(arch_str, num_classes, **kwargs):
                       )
     
     return model.train()
+
+
+fasterrcnn_resnet18 = partial(get_FasterRCNN, arch_str="resnet18")
+fasterrcnn_resnet34 = partial(get_FasterRCNN, arch_str="resnet34")
+fasterrcnn_resnet50 = partial(get_FasterRCNN, arch_str="resnet50")
+fasterrcnn_resnet101 = partial(get_FasterRCNN, arch_str="resnet101")
+fasterrcnn_resnet152 = partial(get_FasterRCNN, arch_str="resnet152")
+
