@@ -34,11 +34,12 @@ def m_ap_metric(preds, targs, num_classes, iou_thresholds=0.4):
 class AvgMetric_Copy(Metric):
     "Average the values of `func` taking into account potential different batch sizes"
     def __init__(self, func, num_classes):  
-        self.func = func(num_classes=num_classes)
+        self.num_classes = num_classes
+        self.func = func()
     def reset(self):           self.total,self.count = 0.,0
     def accumulate(self, learn):
         bs = len(learn.yb)
-        self.total += learn.to_detach(self.func(learn.pred, *learn.yb))*bs
+        self.total += learn.to_detach(self.func(learn.pred, *learn.yb, self.num_classes))*bs
         self.count += bs
     @property
     def value(self): return self.total/self.count if self.count != 0 else None
