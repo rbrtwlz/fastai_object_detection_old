@@ -3,10 +3,10 @@ from fastai.vision.all import *
 from .callbacks import *
 
 
-__all__ = ['fastrcnn_learner']
+__all__ = ['fasterrcnn_learner']
 
 
-class fastrcnn_learner(Learner):
+class fasterrcnn_learner(Learner):
     def __init__(self, dls, model, cbs=None, **kwargs):
         if cbs is not None: cbs = L(FasterRCNNAdapter())+L(cbs)
         else: cbs = [FasterRCNNAdapter()]
