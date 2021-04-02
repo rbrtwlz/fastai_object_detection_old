@@ -14,7 +14,7 @@ class fasterrcnn_learner(Learner):
         super().__init__(dls, model, loss_func=noop, cbs=cbs, **kwargs)
         
     def get_preds(self, items=None, dl=None, item_tfms=None, batch_tfms=None, box_score_thresh=0.05):
-        assert (items is None and dl is None): "Either items or dl is required."
+        assert (items is None and dl is None), "Either items or dl is required."
         if item_tfms is None: item_tfms = [Resize(800)]
         if dl is None:
             dblock = DataBlock(
