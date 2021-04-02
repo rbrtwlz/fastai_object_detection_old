@@ -33,13 +33,12 @@ def m_ap_metric(preds, targs, num_classes, iou_thresholds=0.4):
 
 class AvgMetric_Copy(Metric):
     "Average the values of `func` taking into account potential different batch sizes"
-    def __init__(self, func, num_classes):  
-        self.num_classes = num_classes
+    def __init__(self, func):  
         self.func = func
     def reset(self):           self.total,self.count = 0.,0
     def accumulate(self, learn):
         bs = len(learn.yb)
-        self.total += learn.to_detach(self.func(learn.pred, *learn.yb, self.num_classes))*bs
+        self.total += learn.to_detach(self.func(learn.pred, *learn.yb, num_classes=len(learn.dls.vocab)))*bs
         self.count += bs
     @property
     def value(self): return self.total/self.count if self.count != 0 else None
@@ -54,5 +53,5 @@ def accumulate(x:AvgMetric, learn):
     x.count += bs
 """    
     
-mAP_at_IoU40 = partial(AvgMetric_Copy, func=partial(m_ap_metric, iou_thresholds=0.4))
-mAP_at_IoU90 = partial(AvgMetric_Copy, func=partial(m_ap_metric, iou_thresholds=0.9))
+mAP_at_IoU40 = AvgMetric_Copy(partial(m_ap_metric, iou_thresholds=0.4))
+mAP_at_IoU90 = AvgMetric_Copy(partial(m_ap_metric, iou_thresholds=0.9))
