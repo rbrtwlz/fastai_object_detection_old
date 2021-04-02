@@ -1,6 +1,7 @@
 
 from mean_average_precision import MetricBuilder
-from fastai.metrics import AvgMetric
+#from fastai.metrics import AvgMetric
+from fastai.metrics import Metric
 from functools import partial
 
 __all__ = ['mAP_at_IoU40', 'mAP_at_IoU50', 'mAP_at_IoU60', 'mAP_at_IoU70', 'mAP_at_IoU80', 'mAP_at_IoU90']
