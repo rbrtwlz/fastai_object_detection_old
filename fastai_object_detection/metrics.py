@@ -48,9 +48,8 @@ class mAP_Metric():
     
 class AvgMetric_Copy(Metric):
     "Average the values of `func` taking into account potential different batch sizes"
-    def __init__(self, func):  
-        self.func = func
-    def reset(self):           self.total,self.count = 0.,0
+    def __init__(self, func): self.func = func
+    def reset(self): self.total,self.count = 0.,0
     def accumulate(self, learn):
         bs = len(learn.yb)
         self.total += learn.to_detach(self.func(learn.pred, *learn.yb, num_classes=len(learn.dls.vocab)))*bs
