@@ -24,8 +24,8 @@ def create_metric_samples(preds, targs):
     return [i for i in zip(pred_samples, targ_samples)]
 
 
-def m_ap_metric(preds, targs, iou_thresholds=0.4):
-    metric_fn = MetricBuilder.build_evaluation_metric("map_2d", async_mode=True, num_classes=len(dls.vocab))
+def m_ap_metric(preds, targs, num_classes, iou_thresholds=0.4):
+    metric_fn = MetricBuilder.build_evaluation_metric("map_2d", async_mode=True, num_classes=num_classes)
     for sample_preds, sample_targs in create_metric_samples(preds, targs):
         metric_fn.add(sample_preds, sample_targs)
     metric_batch =  metric_fn.value(iou_thresholds=iou_thresholds)['mAP']
@@ -33,7 +33,8 @@ def m_ap_metric(preds, targs, iou_thresholds=0.4):
 
 class AvgMetric_Copy(Metric):
     "Average the values of `func` taking into account potential different batch sizes"
-    def __init__(self, func):  self.func = func
+    def __init__(self, func, num_classes):  
+        self.func = func(num_classes=num_classes)
     def reset(self):           self.total,self.count = 0.,0
     def accumulate(self, learn):
         bs = len(learn.yb)
@@ -52,9 +53,5 @@ def accumulate(x:AvgMetric, learn):
     x.count += bs
 """    
     
-mAP_at_IoU40 = AvgMetric_Copy(m_ap_metric)
-mAP_at_IoU50 = AvgMetric_Copy(partial(m_ap_metric, iou_thresholds=0.5))
-mAP_at_IoU60 = AvgMetric_Copy(partial(m_ap_metric, iou_thresholds=0.6))
-mAP_at_IoU70 = AvgMetric_Copy(partial(m_ap_metric, iou_thresholds=0.7))
-mAP_at_IoU80 = AvgMetric_Copy(partial(m_ap_metric, iou_thresholds=0.8))
-mAP_at_IoU90 = AvgMetric_Copy(partial(m_ap_metric, iou_thresholds=0.9))
+mAP_at_IoU40 = partial(AvgMetric_Copy, func=partial(m_ap_metric, iou_thresholds=0.4))
+mAP_at_IoU90 = partial(AvgMetric_Copy, func=partial(m_ap_metric, iou_thresholds=0.9))
