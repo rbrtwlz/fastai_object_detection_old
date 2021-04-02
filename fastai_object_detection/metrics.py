@@ -47,7 +47,9 @@ class AvgMetric_Copy(Metric):
     @property
     def name(self):  return self.func.func.__name__ if hasattr(self.func, 'func') else  self.func.__name__
     
-m_ap_metric_40 = partial(m_ap_metric, iou_thresholds=0.4).func.__name__="mAP@IoU>0.4"
+m_ap_metric_40 = partial(m_ap_metric, iou_thresholds=0.4)
+m_ap_metric_40.func.__name__="mAP@IoU>0.4"
 mAP_at_IoU40 = AvgMetric_Copy(m_ap_metric_40)
-m_ap_metric_90 = partial(m_ap_metric, iou_thresholds=0.9).func.__name__="mAP@IoU>0.9"
+m_ap_metric_90 = partial(m_ap_metric, iou_thresholds=0.9)
+m_ap_metric_90.func.__name__="mAP@IoU>0.9"
 mAP_at_IoU90 = AvgMetric_Copy(m_ap_metric_90)
