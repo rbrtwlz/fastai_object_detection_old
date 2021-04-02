@@ -35,7 +35,7 @@ class AvgMetric_Copy(Metric):
     "Average the values of `func` taking into account potential different batch sizes"
     def __init__(self, func, num_classes):  
         self.num_classes = num_classes
-        self.func = func()
+        self.func = func
     def reset(self):           self.total,self.count = 0.,0
     def accumulate(self, learn):
         bs = len(learn.yb)
