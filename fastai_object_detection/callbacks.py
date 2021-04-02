@@ -1,4 +1,6 @@
 from fastai.callback.all import *
+from fastai.torch_basics import *
+from fastai.torch_core import *
 
 __all__ = ['FasterRCNNAdapter']
 
