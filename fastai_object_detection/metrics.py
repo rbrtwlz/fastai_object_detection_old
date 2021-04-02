@@ -6,7 +6,7 @@ from fastai.torch_basics import *
 from fastai.torch_core import *
 from functools import partial
 
-__all__ = ['mAP_at_IoU40','mAP_at_IoU90']# 'mAP_at_IoU50', 'mAP_at_IoU60', 'mAP_at_IoU70', 'mAP_at_IoU80', ]
+__all__ = ['mAP_at_IoU40', 'mAP_at_IoU50', 'mAP_at_IoU60', 'mAP_at_IoU70', 'mAP_at_IoU80', 'mAP_at_IoU90']
 
 def create_metric_samples(preds, targs):
     pred_samples = []
@@ -47,9 +47,27 @@ class AvgMetric_Copy(Metric):
     @property
     def name(self):  return self.func.func.__name__ if hasattr(self.func, 'func') else  self.func.__name__
     
+    
 m_ap_metric_40 = partial(m_ap_metric, iou_thresholds=0.4)
 m_ap_metric_40.func.__name__="mAP@IoU>0.4"
 mAP_at_IoU40 = AvgMetric_Copy(m_ap_metric_40)
+
+m_ap_metric_50 = partial(m_ap_metric, iou_thresholds=0.5)
+m_ap_metric_50.func.__name__="mAP@IoU>0.5"
+mAP_at_IoU50 = AvgMetric_Copy(m_ap_metric_50)
+
+m_ap_metric_60 = partial(m_ap_metric, iou_thresholds=0.6)
+m_ap_metric_60.func.__name__="mAP@IoU>0.6"
+mAP_at_IoU60 = AvgMetric_Copy(m_ap_metric_60)
+
+m_ap_metric_70 = partial(m_ap_metric, iou_thresholds=0.7)
+m_ap_metric_70.func.__name__="mAP@IoU>0.7"
+mAP_at_IoU70 = AvgMetric_Copy(m_ap_metric_70)
+
+m_ap_metric_80 = partial(m_ap_metric, iou_thresholds=0.8)
+m_ap_metric_80.func.__name__="mAP@IoU>0.8"
+mAP_at_IoU80 = AvgMetric_Copy(m_ap_metric_80)
+
 m_ap_metric_90 = partial(m_ap_metric, iou_thresholds=0.9)
 m_ap_metric_90.func.__name__="mAP@IoU>0.9"
 mAP_at_IoU90 = AvgMetric_Copy(m_ap_metric_90)
