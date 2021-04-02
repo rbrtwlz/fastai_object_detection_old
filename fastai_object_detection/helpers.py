@@ -1,3 +1,5 @@
+from fastai.basics import Path
+
 __all__ = ['add_image_path_by_image_id', 'add_bbox_cols_by_xywh']
 
 
