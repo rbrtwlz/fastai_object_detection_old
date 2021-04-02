@@ -42,7 +42,7 @@ class mAP_Metric():
         metric_fn = MetricBuilder.build_evaluation_metric("map_2d", async_mode=True, num_classes=num_classes)
         for sample_preds, sample_targs in create_metric_samples(preds, targs):
             metric_fn.add(sample_preds, sample_targs)
-        metric_batch =  metric_fn.value(iou_thresholds=iou_thresholds)['mAP']
+        metric_batch = metric_fn.value(iou_thresholds=self.iou_thresholds)['mAP']
         return metric_batch
 
     
@@ -57,7 +57,7 @@ class AvgMetric_Copy(Metric):
     @property
     def value(self): return self.total/self.count if self.count != 0 else None
     @property
-    def name(self):  return self.func.func.__name__ if hasattr(self.func, 'func') else  self.func.__name__
+    def name(self): return self.func.func.__name__ if hasattr(self.func, 'func') else  self.func.__name__
     
     
 mAP_at_IoU40 = AvgMetric_Copy(mAP_Metric(0.4, "mAP@IoU>0.4"))
