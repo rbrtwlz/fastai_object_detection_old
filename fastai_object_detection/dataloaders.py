@@ -41,14 +41,15 @@ class ObjectDetectionDataLoaders(DataLoaders):
     def _get_images(df):
         img_path_col = ObjectDetectionDataLoaders.img_path_col
         
-        fns = L(fn for fn in df["image_path"].unique())
+        fns = L(fn for fn in df[img_path_col].unique())
         return fns
 
     def _get_bboxes(fn):
         df = ObjectDetectionDataLoaders.df
+        img_id_col = ObjectDetectionDataLoaders.img_id_col
         x_min, y_min, x_max, y_max = ObjectDetectionDataLoaders.bbox_cols
         
-        filt = df["id"] == Path(fn).stem
+        filt = df[img_id_col] == Path(fn).stem
         bboxes = [list(i) for i in zip(df.loc[filt,x_min], df.loc[filt,y_min], 
                                        df.loc[filt,x_max], df.loc[filt,y_max])]
         return bboxes
