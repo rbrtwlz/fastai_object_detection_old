@@ -19,7 +19,7 @@ def get_FasterRCNN(arch_str, num_classes, pretrained=True, **kwargs):
                        rpn_anchor_generator=anchor_generator,
                        box_fg_iou_thresh=0.5,
                        box_bg_iou_thresh=0.5,
-                       box_score_thresh=0.6,
+                       #box_score_thresh=0.6,
                        **kwargs
                       )
     
