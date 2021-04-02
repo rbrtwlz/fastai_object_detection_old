@@ -13,7 +13,8 @@ class fasterrcnn_learner(Learner):
         model = model(num_classes=len(dls.vocab))
         super().__init__(dls, model, loss_func=noop, cbs=cbs, **kwargs)
         
-    def get_preds(self, items, dl=None, item_tfms=None, batch_tfms=None):
+    def get_preds(self, items=None, dl=None, item_tfms=None, batch_tfms=None, box_score_thresh=0.05):
+        assert (items is None and dl is None): "Either items or dl is required."
         if item_tfms is None: item_tfms = [Resize(800)]
         if dl is None:
             dblock = DataBlock(
@@ -37,6 +38,9 @@ class fasterrcnn_learner(Learner):
         preds = [torch.cat([p["boxes"],p["labels"].unsqueeze(1),p["scores"].unsqueeze(1)], dim=1) 
                  for p in preds]
         
+        # only preds with score > box_score_thresh
+        preds = [p[p[:,5]>box_score_thresh] for p in preds]
+        
         boxes = [p[:,:4] for p in preds]
         labels = [p[:,4] for p in preds]
         scores = [p[:,5] for p in preds]
@@ -45,8 +49,7 @@ class fasterrcnn_learner(Learner):
     
     
     def show_results(self, items, max_n=9,  **kwargs):
-
-        inputs, bboxes, labels, scores  = self.get_preds(items)
+        inputs, bboxes, labels, scores  = self.get_preds(items=items, box_score_thresh=0.6)
         #idx = 10
         for idx in range(len(inputs)):
             if idx >= max_n: break
