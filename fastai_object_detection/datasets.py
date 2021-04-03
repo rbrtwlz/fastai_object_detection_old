@@ -90,7 +90,7 @@ class CocoDatasetManager():
         cat_ids = self.coco.getCatIds(catNms=self.cat_list);
         self.idx2cat = {e['id']:e['name'] for e in self.coco.loadCats(self.coco.getCatIds())}
         self.img_id2fn = {}
-        print("Found "+str(len(cat_ids))+" categories.")
+        print("Found "+str(len(cat_ids))+" valid categories.")
         print([self.idx2cat[e] for e in cat_ids])
         print("Starting download.")
         mb = master_bar(range(len(cat_ids)))
