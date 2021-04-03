@@ -31,7 +31,7 @@ class CocoDatasetManager():
         self.df_train = pd.DataFrame()
 
 
-    def get_dataset_path(self):
+    def get_ds_path(self):
         if Path(self.path).is_dir():
             return self.path
 
@@ -65,7 +65,7 @@ class CocoDatasetManager():
         return self.path
 
 
-    def get_dataframe(self):
+    def get_df(self):
         if (self.path/"df_train.csv").is_file():
             return pd.read_csv(self.path/"df_train.csv")
         else:
