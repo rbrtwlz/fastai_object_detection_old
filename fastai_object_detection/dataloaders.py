@@ -46,19 +46,19 @@ class ObjectDetectionDataLoaders(DataLoaders):
 
     def _get_bboxes(fn):
         df = ObjectDetectionDataLoaders.df
-        img_id_col = ObjectDetectionDataLoaders.img_id_col
+        img_path_col = ObjectDetectionDataLoaders.img_path_col
         x_min, y_min, x_max, y_max = ObjectDetectionDataLoaders.bbox_cols
         
-        filt = df[img_id_col] == Path(fn).stem
+        filt = df[img_path_col] == Path(fn)
         bboxes = [list(i) for i in zip(df.loc[filt,x_min], df.loc[filt,y_min], 
                                        df.loc[filt,x_max], df.loc[filt,y_max])]
         return bboxes
 
     def _get_labels(fn):
         df = ObjectDetectionDataLoaders.df
-        img_id_col = ObjectDetectionDataLoaders.img_id_col
+        img_path_col = ObjectDetectionDataLoaders.img_path_col
         class_col = ObjectDetectionDataLoaders.class_col
         
-        filt = df[img_id_col] == Path(fn).stem
+        filt = df[img_path_col] == Path(fn)
         labels = [l for l in df.loc[filt, class_col]]
         return labels
