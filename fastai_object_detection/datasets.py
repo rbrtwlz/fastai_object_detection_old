@@ -159,7 +159,7 @@ class CocoDatasetManager():
 
 
     def show_examples(self, n=3):
-        df = self.get_dataframe()
+        df = self.get_df()
         img_ids = [i for i in df.image_id.unique()]
         shuffle(img_ids)
         for img_id in img_ids[:n]:
