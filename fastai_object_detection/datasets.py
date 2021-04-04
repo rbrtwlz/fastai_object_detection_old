@@ -70,7 +70,7 @@ class CocoDatasetManager():
         if (self.path/"df_train.csv").is_file():
             return pd.read_csv(self.path/"df_train.csv")
         else:
-            print("No Dataframe found in "+self.path)
+            print("No Dataframe found in "+str(self.path))
             return
 
 
