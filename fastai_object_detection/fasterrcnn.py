@@ -42,7 +42,7 @@ def get_FasterRCNN(arch_str, num_classes, pretrained=True, pretrained_backbone=T
                                                   progress=progress)
             model.load_state_dict(state_dict)
         except Exception as e: 
-            #print(e)
+            print(e)
             print("No pretrained coco model found for fasterrcnn_"+arch_str)
     
     return model.train()
