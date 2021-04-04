@@ -6,6 +6,16 @@ from functools import partial
 
 __all__ = ['get_FasterRCNN', 'fasterrcnn_resnet18', 'fasterrcnn_resnet34', 'fasterrcnn_resnet50', 'fasterrcnn_resnet101', 'fasterrcnn_resnet152']
 
+
+model_urls = {
+    'fasterrcnn_resnet50_fpn_coco':
+        'https://download.pytorch.org/models/fasterrcnn_resnet50_fpn_coco-258fb6c6.pth',
+    'fasterrcnn_mobilenet_v3_large_320_fpn_coco':
+        'https://download.pytorch.org/models/fasterrcnn_mobilenet_v3_large_320_fpn-907ea3f9.pth',
+    'fasterrcnn_mobilenet_v3_large_fpn_coco':
+        'https://download.pytorch.org/models/fasterrcnn_mobilenet_v3_large_fpn-fb6a3cc7.pth'
+}
+
 def get_FasterRCNN(arch_str, num_classes, pretrained=True, pretrained_backbone=True, **kwargs):
     
     #if pretrained == True: pretrained_backbone=False
@@ -32,8 +42,8 @@ def get_FasterRCNN(arch_str, num_classes, pretrained=True, pretrained_backbone=T
                                                   progress=progress)
             model.load_state_dict(state_dict)
         except Exception as e: 
-            print(e)
-            print("No pretrained model found for "+arch_str)
+            #print(e)
+            print("No pretrained coco model found for fasterrcnn_"+arch_str)
     
     return model.train()
 
