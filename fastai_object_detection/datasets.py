@@ -141,7 +141,7 @@ class CocoDatasetManager():
                 mask = np.zeros(self.coco.annToMask(annos[0]).shape, dtype=np.uint8)
                 for j,p_idx in enumerate(df_mask_pixel_idx):
                     mask += self.coco.annToMask(annos[j]) * p_idx
-                    Image.fromarray(mask).save(mask_path)
+                Image.fromarray(mask).save(mask_path)
 
                 df = pd.DataFrame({"image_id":df_img_id, "image_path":df_img_path, 
                                    "mask_path":df_mask_path, "mask_pixel_idx":df_mask_pixel_idx, 
