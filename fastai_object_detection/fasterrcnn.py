@@ -28,8 +28,8 @@ def get_FasterRCNN(arch_str, num_classes, pretrained=True, pretrained_backbone=T
     
     if pretrained:
         try:
-            state_dict = load_state_dict_from_url(model_urls["fasterrcnn_"+arch_str+'_fpn_coco'],
-                                              progress=progress)
+            state_dict = load_state_dict_from_url(model_urls['fasterrcnn_resnet50_fpn_coco'],
+                                                  progress=progress)
             model.load_state_dict(state_dict)
         except: 
             print("No pretrained model found for "+arch_str)
