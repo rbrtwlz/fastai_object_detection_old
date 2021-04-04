@@ -28,7 +28,7 @@ def get_FasterRCNN(arch_str, num_classes, pretrained=True, pretrained_backbone=T
     
     if pretrained:
         try:
-            state_dict = load_state_dict_from_url(model_urls[arch_str+'_fpn_coco'],
+            state_dict = load_state_dict_from_url(model_urls["fasterrcnn_"+arch_str+'_fpn_coco'],
                                               progress=progress)
             model.load_state_dict(state_dict)
         except: 
