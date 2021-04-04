@@ -32,6 +32,8 @@ def get_FasterRCNN(arch_str, num_classes, pretrained=True, pretrained_backbone=T
                        rpn_anchor_generator=anchor_generator,
                        box_fg_iou_thresh=0.5,
                        box_bg_iou_thresh=0.5,
+                       image_mean = [0.0, 0.0, 0.0], # already normalized by fastai
+                       image_std = [1.0, 1.0, 1.0],
                        #box_score_thresh=0.6,
                        **kwargs
                       )
