@@ -36,15 +36,23 @@ def get_FasterRCNN(arch_str, num_classes, pretrained=True, pretrained_backbone=T
                        **kwargs
                       )
     
-    """
+
     if pretrained:
         try:
-            state_dict = load_state_dict_from_url(model_urls['fasterrcnn_'+arch_str+'_fpn_coco'], progress=True)
-            model.load_state_dict(state_dict)
+            pretrained_dict = load_state_dict_from_url(model_urls['fasterrcnn_'+arch_str+'_fpn_coco'], progress=True)
+            model_dict = model.state_dict()
+            
+            pretrained_dict = {k: v for k, v in pretrained_dict.items() if
+                       (k in model_dict) and (model_dict[k].shape == pretrained_dict[k].shape)}
+                     
+            model_dict.update(pretrained_dict) 
+            model.load_state_dict(model_dict)
+            
         except Exception as e: 
             print(e)
             print("No pretrained coco model found for fasterrcnn_"+arch_str)
             
+    """
             Error(s) in loading state_dict for FasterRCNN:
             size mismatch for roi_heads.box_predictor.cls_score.weight: copying a param with shape torch.Size([91, 1024]) from checkpoint, the shape in current model is torch.Size([3, 1024]).
             size mismatch for roi_heads.box_predictor.cls_score.bias: copying a param with shape torch.Size([91]) from checkpoint, the shape in current model is torch.Size([3]).
