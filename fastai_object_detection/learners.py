@@ -8,8 +8,8 @@ __all__ = ['fasterrcnn_learner']
 
 class fasterrcnn_learner(Learner):
     def __init__(self, dls, model, cbs=None, pretrained=True, pretrained_backbone=True, **kwargs):
-        if cbs is not None: cbs = L(FasterRCNNAdapter())+L(cbs)
-        else: cbs = [FasterRCNNAdapter()]
+        if cbs is not None: cbs = L(RCNNAdapter())+L(cbs)
+        else: cbs = [RCNNAdapter()]
         model = model(num_classes=len(dls.vocab), pretrained=pretrained, pretrained_backbone=pretrained_backbone)
         super().__init__(dls, model, loss_func=noop, cbs=cbs, **kwargs)
         
