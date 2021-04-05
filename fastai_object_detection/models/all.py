@@ -1,3 +1,3 @@
 
-from fasterrcnn import *
-from maskrcnn import *
+from .fasterrcnn import *
+from .maskrcnn import *
