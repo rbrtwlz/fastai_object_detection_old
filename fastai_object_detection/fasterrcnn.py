@@ -2,6 +2,7 @@ from torchvision.models.detection.backbone_utils import resnet_fpn_backbone
 from torchvision.models.utils import load_state_dict_from_url
 from torchvision.models.detection.anchor_utils import AnchorGenerator
 from torchvision.models.detection import FasterRCNN
+from torchvision.ops.misc import FrozenBatchNorm2d
 from functools import partial
 
 __all__ = ['get_FasterRCNN', 'fasterrcnn_resnet18', 'fasterrcnn_resnet34', 'fasterrcnn_resnet50', 'fasterrcnn_resnet101', 'fasterrcnn_resnet152']
