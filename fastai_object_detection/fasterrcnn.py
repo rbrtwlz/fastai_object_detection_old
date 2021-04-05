@@ -2,7 +2,7 @@ from torchvision.models.detection.backbone_utils import resnet_fpn_backbone
 from torchvision.models.utils import load_state_dict_from_url
 from torchvision.models.detection.anchor_utils import AnchorGenerator
 from torchvision.models.detection import FasterRCNN
-from torchvision.models.detection._utils import overwrite_eps
+#from torchvision.models.detection._utils import overwrite_eps
 from functools import partial
 
 __all__ = ['get_FasterRCNN', 'fasterrcnn_resnet18', 'fasterrcnn_resnet34', 'fasterrcnn_resnet50', 'fasterrcnn_resnet101', 'fasterrcnn_resnet152']
@@ -50,7 +50,7 @@ def get_FasterRCNN(arch_str, num_classes, pretrained=True, pretrained_backbone=T
                      
             model_dict.update(pretrained_dict) 
             model.load_state_dict(model_dict)
-            overwrite_eps(model, 0.0)
+            #overwrite_eps(model, 0.0)
             
         except Exception as e: 
             #print(e)
