@@ -41,7 +41,7 @@ If you want to use MaskRCNN for instance segementation, following columns are ad
 There are helper functions available, for example for adding the `image_path` by `image_id` or to change the bbox format from `xywh` to `x1y1x2y2`.
 
 Also there is a `CocoData` class provided to help you to download images and generate a DataFrame.
-Simply use the following line to create a dataset for cats and dogs detection:
+Simply use the following line to create a dataset for cat and dog detection:
 
 ```python
 path, df = CocoData.create(ds_name="coco-cats-and-dogs", cat_list=["cat", "dog"], max_images=2000, with_mask=True)
