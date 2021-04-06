@@ -97,10 +97,10 @@ class RCNNAdapter(Callback):
                 #print(u)
                 if len(u) == 0:
                     print("empty mask")
-                    dict_["masks"] = torch.empty([0,h,w], dtype=torch.uint8, device=a.device) # how to deal with empty mask?
+                    #dict_["masks"] = torch.empty([0,h,w], dtype=torch.uint8, device=a.device) # how to deal with empty mask?
+                    dict_["masks"] = torch.zeros([0,h,w], dtype=torch.uint8, device=a.device)
                 else:
                     dict_["masks"] = torch.stack([torch.where(dict_["masks"]==m.item(),1,0) for m in u]) # better pytorch solution?
-                print("after empty mask")
             new_y.append(dict_)
         return [x1],[new_y] # xb,yb
     
