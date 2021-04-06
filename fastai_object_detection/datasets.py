@@ -29,9 +29,7 @@ class CocoData():
         with_mask = with_mask
         max_images = max_images
 
-        if data_path is None: path = Path(URLs.path(c_key='data'))/ds_name
-        else: path = Path(data_path)/ds_name
-
+        path = Path(URLs.path(c_key='data'))/ds_name if data_path is None else Path(data_path)/ds_name
         path_images = path/"images"
         path_masks = path/"masks"
 
@@ -65,8 +63,7 @@ class CocoData():
 
     def get_path_df(ds_name, data_path=None):
 
-        if data_path is None: path = Path(URLs.path(c_key='data'))/ds_name
-        else: path = Path(data_path)/ds_name
+        path = Path(URLs.path(c_key='data'))/ds_name if data_path is None else Path(data_path)/ds_name
 
         if path.is_dir():
             if (path/"df_train.csv").is_file():
@@ -79,22 +76,21 @@ class CocoData():
 
 
     def ls(data_path=None):
-        if data_path is None: path = Path(URLs.path(c_key='data'))
-        else: path = Path(data_path)
+        path = Path(URLs.path(c_key='data')) if data_path is None else Path(data_path)
         if path.is_dir():
             return list(path.ls())
         else: print("Path "+str(path)+" does not exist.")
 
+            
     def remove(ds_name, data_path=None):
-        if data_path is None: path = Path(URLs.path(c_key='data'))/ds_name
-        else: path = Path(data_path)/ds_name
-
+        path = Path(URLs.path(c_key='data'))/ds_name if data_path is None else Path(data_path)/ds_name
         if path.is_dir():
             rmtree(path)
             print(str(path)+" removed.")
         else:
             print("No dataset '"+str(path)+"' found.")
 
+            
     def show_examples(ds_name, data_path=None, n=3):
         _, df = CocoData.get_path_df(ds_name, data_path=data_path) 
 
