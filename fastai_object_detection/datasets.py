@@ -72,7 +72,7 @@ class CocoData():
                 print("No Dataframe found in "+str(path))
         else:
             print("No dataset '"+str(path)+"' found.")
-            print("Create dataset first with CocoData.create(ds_name, cat_list) or list available dataset with CocoData.ls()")
+            print("Create dataset first with CocoData.create(ds_name, cat_list) or list available datasets with CocoData.ls()")
 
 
     def ls(data_path=None):
