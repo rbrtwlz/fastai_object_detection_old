@@ -68,7 +68,7 @@ class maskrcnn_learner(Learner):
         super().__init__(dls, model, loss_func=noop, cbs=cbs, **kwargs)
         
     def get_preds(self, items, item_tfms=None, batch_tfms=None, box_score_thresh=0.05):
-        if item_tfms is None: item_tfms = [Resize(800)]
+        if item_tfms is None: item_tfms = [Resize(800, method="pad", pad_mode="zeros")]
         dblock = DataBlock(
             blocks=(ImageBlock(cls=PILImage)),
             item_tfms=item_tfms,
