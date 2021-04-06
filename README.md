@@ -6,7 +6,7 @@ Install it with
 
 `pip install --upgrade git+https://github.com/rbrtwlz/fastai_object_detection`
 
-This package makes pytorch's FasterRCNN and MaskRCNN available for [fastai](https://www.fast.ai/) users by using a callback which converts the batches to the required input for FasterRCNN or MaskRCNN. It comes with a fastai `Dataloaders` class for object detection, prepared and easy to use models and some metrics to measure generated bounding boxes (mAP). So you can train a model for object detection in the simple fastai way with one of the two included learner classes:
+This package makes pytorch's FasterRCNN and MaskRCNN available for [fastai](https://www.fast.ai/) users by using a callback which converts the batches to the required input for FasterRCNN or MaskRCNN. It comes with a fastai `Dataloaders` class for object detection, prepared and easy to use models and some metrics to measure generated bounding boxes (mAP). So you can train a model for object detection in the simple fastai way with one of two included learner classes:
 
 ```python
 from fastai.vision.all import *
