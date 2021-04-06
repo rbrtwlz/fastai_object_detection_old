@@ -1,6 +1,7 @@
 from fastai.callback.all import *
 from fastai.torch_basics import *
 from fastai.torch_core import *
+from datetime import datetime
 
 __all__ = ['RCNNAdapter']
 
@@ -14,6 +15,11 @@ class RCNNAdapter(Callback):
         self.learn.save_yb = []
 
     def before_batch(self):
+     
+        now = datetime.now()
+        current_time = now.strftime("%H:%M:%S")
+        print("Current Time =", current_time)
+        
         self.learn.save_xb = self.learn.xb
         self.learn.save_yb = self.learn.yb
         
