@@ -2,7 +2,7 @@
 
 Extension of the fastai library to include object recognition.
 
-You can install it with
+Install it with
 
 `pip install --upgrade git+https://github.com/rbrtwlz/fastai_object_detection`
 
