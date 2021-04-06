@@ -51,7 +51,7 @@ Simply use the following line to create a dataset for cat and dog detection:
 path, df = CocoData.create(ds_name="coco-cats-and-dogs", cat_list=["cat", "dog"], 
                            max_images=2000, with_mask=True)
 ```
-By default, when no path is specified, it creates a new dataset in fastai's data path (like `untar_data()`)
+By default, when no `data_path` is specified, it creates a new dataset in fastai's data path (like `untar_data()`)
 
 You can always list all available dataset with 
 ```python
