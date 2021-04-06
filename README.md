@@ -31,13 +31,13 @@ For the image, which contains the object:
 * `image_id`
 * `image_path`
 
-The objects bounding box:
+The object's bounding box:
 * `x_min`
 * `y_min`
 * `x_max`
 * `y_max`
 
-The objects class/label:
+The object's class/label:
 * `class_name`
 
 If you want to use MaskRCNN for instance segementation, following columns are additionally needed:
