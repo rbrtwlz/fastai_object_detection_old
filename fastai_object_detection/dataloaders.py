@@ -28,7 +28,7 @@ class ObjectDetectionDataLoaders(DataLoaders):
         with_mask = mask_path_col in df.columns
         
         if item_tfms is None:
-            item_tfms = [Resize(800)]
+            item_tfms = [Resize(800, method="pad", pad_mode="zeros")]
             
         if not with_mask:
             dblock = DataBlock(
