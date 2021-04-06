@@ -25,9 +25,6 @@ class CocoData():
 
     @classmethod
     def create(cls, ds_name, cat_list, data_path=None, with_mask=False, max_images=1000):
-        cat_list = cat_list
-        with_mask = with_mask
-        max_images = max_images
 
         path = Path(URLs.path(c_key='data'))/ds_name if data_path is None else Path(data_path)/ds_name
         path_images = path/"images"
