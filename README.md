@@ -8,7 +8,10 @@ This package makes pytorch's FasterRCNN and MaskRCNN available for [fastai](http
 from fastai.vision.all import *
 from fastai_object_detection.all import *
 
-dls = ObjectDetectionDataLoaders.from_df(df, bs=2, item_tfms=[Resize(800)], batch_tfms=[Normalize.from_stats(*imagenet_stats)])
+dls = ObjectDetectionDataLoaders.from_df(df, 
+                                         bs=2, 
+                                         item_tfms=[Resize(800)], 
+                                         batch_tfms=[Normalize.from_stats(*imagenet_stats)])
 dls.show_batch()
 
 learn = fasterrcnn_learner(dls, fasterrcnn_resnet50, metrics=[mAP_at_IoU40, mAP_at_IoU60, mAP_at_IoU90])
