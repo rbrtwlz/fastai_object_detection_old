@@ -14,7 +14,7 @@ dls = ObjectDetectionDataLoaders.from_df(df,
                                          batch_tfms=[Normalize.from_stats(*imagenet_stats)])
 dls.show_batch()
 
-learn = fasterrcnn_learner(dls, fasterrcnn_resnet50, metrics=[mAP_at_IoU40, mAP_at_IoU60, mAP_at_IoU90])
+learn = fasterrcnn_learner(dls, fasterrcnn_resnet50, metrics=[mAP_at_IoU40, mAP_at_IoU60])
 learn.lr_find()
 
 learn.fit_one_cycle(1, 1e-04)
