@@ -13,16 +13,13 @@ class fasterrcnn_learner(Learner):
         model = model(num_classes=len(dls.vocab), pretrained=pretrained, pretrained_backbone=pretrained_backbone)
         super().__init__(dls, model, loss_func=noop, cbs=cbs, **kwargs)
         
-    def get_preds(self, items=None, dl=None, item_tfms=None, batch_tfms=None, box_score_thresh=0.05):
-
+    def get_preds(self, items=None, item_tfms=None, batch_tfms=None, box_score_thresh=0.05):
         if item_tfms is None: item_tfms = [Resize(800)]
-        if dl is None:
-            dblock = DataBlock(
-                blocks=(ImageBlock(cls=PILImage)),
-                item_tfms=item_tfms,
-                batch_tfms=batch_tfms)
-            test_dl = dblock.dataloaders(items).test_dl(items, bs=self.dls.bs)
-        else: test_dl = dl
+        dblock = DataBlock(
+            blocks=(ImageBlock(cls=PILImage)),
+            item_tfms=item_tfms,
+            batch_tfms=batch_tfms)
+        test_dl = dblock.dataloaders(items).test_dl(items, bs=self.dls.bs)
         inputs,preds = [],[]
         with torch.no_grad():
             for i,batch in enumerate(progress_bar(test_dl)):
