@@ -2,7 +2,7 @@ from fastprogress.fastprogress import progress_bar
 from fastai.vision.all import *
 from .callbacks import *
 
-# its intended to have two classes here, even if they could get merged 
+# it's intended to have two classes here, even if it would be easy to merge them
 
 __all__ = ['fasterrcnn_learner', 'maskrcnn_learner']
 
