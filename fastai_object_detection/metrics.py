@@ -71,7 +71,8 @@ class AvgMetric_Copy(Metric):
     def __init__(self, func): self.func = func
     def reset(self): self.total,self.count = 0.,0
     def accumulate(self, learn):
-        bs = len(learn.yb)
+        bs = len(learn.xb[0])
+        print("bs:",bs)
         self.total += learn.to_detach(self.func(learn.pred, *learn.yb, num_classes=len(learn.dls.vocab)))*bs
         self.count += bs
     @property
