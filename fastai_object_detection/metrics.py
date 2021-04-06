@@ -63,7 +63,7 @@ class mAP_Metric():
             targ_np = np.array(targ.detach().cpu())
             targ_samples.append(targ_np)
 
-        return [i for i in zip(pred_samples, targ_samples)]
+        return [s for s in zip(pred_samples, targ_samples)]
 
     
 class AvgMetric_Copy(Metric):
