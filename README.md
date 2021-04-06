@@ -44,7 +44,8 @@ Also there is a `CocoData` class provided to help you to download images from [C
 Simply use the following line to create a dataset for cat and dog detection:
 
 ```python
-path, df = CocoData.create(ds_name="coco-cats-and-dogs", cat_list=["cat", "dog"], max_images=2000, with_mask=True)
+path, df = CocoData.create(ds_name="coco-cats-and-dogs", cat_list=["cat", "dog"], 
+                           max_images=2000, with_mask=True)
 ```
 By default, when no path is specified, it create a new dataset in fastai's data path (like `untar_data()`)
 
