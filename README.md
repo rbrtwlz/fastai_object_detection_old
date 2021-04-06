@@ -57,10 +57,10 @@ get the path and the `DataFrame` of a dataset
 ```python
 path,df = CocoData.get_path_df(ds_name="coco-cats-and-dogs")
 ```
-remove the dataset
+remove a dataset
 
 ```python
-path,df = CocoData.remove(ds_name="coco-cats-and-dogs")
+CocoData.remove(ds_name="coco-cats-and-dogs")
 ```
 or show some examples
 
