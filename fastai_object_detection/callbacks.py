@@ -14,7 +14,6 @@ class RCNNAdapter(Callback):
         self.learn.save_yb = []
 
     def before_batch(self):
-        print("new batch")
         self.learn.save_xb = self.learn.xb
         self.learn.save_yb = self.learn.yb
         
@@ -88,21 +87,21 @@ class RCNNAdapter(Callback):
             dict_["boxes"] = (dict_["boxes"]+1)* (h/2) 
             if with_mask:
                 # mask to stacked binary masks
+                # there are some issues when using crop as resize method, like empty masks and non empty bbox
                 a = dict_["masks"]
                 #u = torch.unique(dict_["masks"])[1:]  this does not work if object covers whole image
                 u = torch.unique(dict_["masks"])
                 u = u[u!=0]
-                #print(u)
                 if len(u) == 0:
-                    print("empty mask")
-                    empty = True
+                    #print("empty mask")
+                    #empty = True
                     dict_["masks"] = torch.empty([0,h,w], dtype=torch.uint8, device=a.device) 
-                    # for wierd cases where bbox is very small and there are no segmentation pixels:
+                    # for weird cases where bbox is very thin and there are no segmentation pixels:
                     dict_["boxes"] = torch.empty([0,4], device=a.device)
                     dict_["labels"] = torch.empty([0], dtype=torch.int64, device=a.device)
                 else:
                     dict_["masks"] = torch.stack([torch.where(dict_["masks"]==m.item(),1,0) for m in u]) # better pytorch solution?
-            if empty: print(dict_)
+            #if empty: print(dict_)
             new_y.append(dict_)
         return [x1],[new_y] # xb,yb
     
