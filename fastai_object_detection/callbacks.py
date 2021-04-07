@@ -77,6 +77,7 @@ class RCNNAdapter(Callback):
 
         new_y = []
         for dict_ in y:
+            empty=False
             # remove padding
             a = dict_["boxes"]
             dict_["boxes"] = a[~torch.all(torch.eq(a,tensor([0.,0.,0.,0.], device=a.device)), dim=1)]
