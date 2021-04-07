@@ -77,7 +77,7 @@ class RCNNAdapter(Callback):
 
         new_y = []
         for dict_ in y:
-            empty=False
+            #empty=False
             # remove padding
             a = dict_["boxes"]
             dict_["boxes"] = a[~torch.all(torch.eq(a,tensor([0.,0.,0.,0.], device=a.device)), dim=1)]
@@ -85,22 +85,37 @@ class RCNNAdapter(Callback):
             dict_["labels"] = a[a!=self.na_idx]
             # scale back
             dict_["boxes"] = (dict_["boxes"]+1)* (h/2) 
+            boxes = dict_["boxes"]
             if with_mask:
+                if len(boxes) == 0:
+                    dict_["masks"] = torch.empty([0,h,w], dtype=torch.uint8, device=boxes.device)
                 # mask to stacked binary masks
-                # there are some issues when using crop as resize method, like empty masks and non empty bbox
-                a = dict_["masks"]
+                else:
+                    m = dict_["masks"]
+                    m = torch.stack([torch.where(m[i]==i+1,1,0) for i in range(len(boxes))]) # better pytorch solution?
+                    #dict_["masks"] = torch.stack([torch.where(dict_["masks"]==m.item(),1,0) for m in u]) 
+
+                    # there are sometimes issues when using crop as resize method, 
+                    # like very thin bbox at the edge and empty segmentation mask
+                    # filter them out
+                    filt = m.sum(dim=-1).sum(dim=-1)!=0 # find empty binary segmentation masks
+                    dict_["masks"] = dict_["masks"][filt]
+                    dict_["labels"] = dict_["labels"][filt]
+                    dict_["boxes"] = dict_["boxes"][filt]
+                    
+                #a = dict_["masks"]
                 #u = torch.unique(dict_["masks"])[1:]  this does not work if object covers whole image
-                u = torch.unique(dict_["masks"])
-                u = u[u!=0]
-                if len(u) == 0:
+                #u = torch.unique(dict_["masks"])
+                #u = u[u!=0]
+                #if len(u) == 0:
                     #print("empty mask")
                     #empty = True
-                    dict_["masks"] = torch.empty([0,h,w], dtype=torch.uint8, device=a.device) 
+                    #dict_["masks"] = torch.empty([0,h,w], dtype=torch.uint8, device=a.device) 
                     # for weird cases where bbox is very thin and there are no segmentation pixels:
-                    dict_["boxes"] = torch.empty([0,4], device=a.device)
-                    dict_["labels"] = torch.empty([0], dtype=torch.int64, device=a.device)
-                else:
-                    dict_["masks"] = torch.stack([torch.where(dict_["masks"]==m.item(),1,0) for m in u]) # better pytorch solution?
+                    #dict_["boxes"] = torch.empty([0,4], device=a.device)
+                    #dict_["labels"] = torch.empty([0], dtype=torch.int64, device=a.device)
+                #else:
+                    #dict_["masks"] = torch.stack([torch.where(dict_["masks"]==m.item(),1,0) for m in u]) # better pytorch solution?
             #if empty: print(dict_)
             new_y.append(dict_)
         return [x1],[new_y] # xb,yb
