@@ -86,6 +86,7 @@ class RCNNAdapter(Callback):
             # scale back
             dict_["boxes"] = (dict_["boxes"]+1)* (h/2) 
             boxes = dict_["boxes"]
+            print(boxes.shape)
             if with_mask:
                 if len(boxes) == 0:
                     dict_["masks"] = torch.empty([0,h,w], dtype=torch.uint8, device=boxes.device)
@@ -102,6 +103,7 @@ class RCNNAdapter(Callback):
                     dict_["masks"] = dict_["masks"][filt]
                     dict_["labels"] = dict_["labels"][filt]
                     dict_["boxes"] = dict_["boxes"][filt]
+                    print(dict_["boxes"].shape)
                     
                 #a = dict_["masks"]
                 #u = torch.unique(dict_["masks"])[1:]  this does not work if object covers whole image
