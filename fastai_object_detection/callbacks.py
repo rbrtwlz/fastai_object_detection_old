@@ -105,7 +105,7 @@ class RCNNAdapter(Callback):
                 else:
                     dict_["masks"] = torch.stack([torch.where(dict_["masks"]==m.item(),1,0) for m in u]) # better pytorch solution?
             if empty: print(dict_)
-            if empty: print("box before:"+box_before)
+            if empty: print("box before:"+str(box_before))
             new_y.append(dict_)
         return [x1],[new_y] # xb,yb
     
