@@ -99,7 +99,7 @@ class RCNNAdapter(Callback):
                     dict_["masks"] = torch.empty([0,h,w], dtype=torch.uint8, device=a.device) 
                     # for wierd cases where bbox is very small and there are no segmentation pixels:
                     dict_["boxes"] = torch.empty([0,4], device=a.device)
-                    dict_["labels"] = torch.empty([0], device=a.device)
+                    dict_["labels"] = torch.empty([0], dtype=torch.int64, device=a.device)
                 else:
                     dict_["masks"] = torch.stack([torch.where(dict_["masks"]==m.item(),1,0) for m in u]) # better pytorch solution?
             if empty: print(dict_)
