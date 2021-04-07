@@ -103,11 +103,15 @@ class RCNNAdapter(Callback):
                     # like very thin bbox at the edge and empty segmentation mask
                     # filter them out
                     filt = m.sum(dim=-1).sum(dim=-1)!=0 # find empty binary segmentation masks
+                    print("filter:")
                     print(filt)
+                    print("bbox before filter:")
                     print(dict_["boxes"])
                     dict_["masks"] = dict_["masks"][filt]
                     dict_["labels"] = dict_["labels"][filt]
                     dict_["boxes"] = dict_["boxes"][filt]
+                    print("bbox after filter")
+                    print(dict_["boxes"])
                     print(dict_["boxes"].shape)
                     
                 #a = dict_["masks"]
