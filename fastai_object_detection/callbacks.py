@@ -96,7 +96,7 @@ class RCNNAdapter(Callback):
                 # mask to stacked binary masks
                 else:
                     m = dict_["masks"]
-                    m = torch.stack([torch.where(m==i+1,1,0) for i in range(len(boxes))]) # better pytorch solution?
+                    m = torch.stack([torch.where(m[i]==i+1,1,0) for i in range(len(boxes))]) # better pytorch solution?
                     print("binary masks")
                     print(m.shape)
                     #dict_["masks"] = torch.stack([torch.where(dict_["masks"]==m.item(),1,0) for m in u]) 
@@ -109,7 +109,7 @@ class RCNNAdapter(Callback):
                     print(filt)
                     print("bbox before filter:")
                     print(dict_["boxes"])
-                    dict_["masks"] = dict_["masks"][filt]
+                    dict_["masks"] = dict_["masks"][filt,:,:]
                     dict_["labels"] = dict_["labels"][filt]
                     dict_["boxes"] = dict_["boxes"][filt]
                     print("bbox after filter")
