@@ -83,6 +83,7 @@ class RCNNAdapter(Callback):
 
         new_y = []
         for dict_ in y:
+            empty = False
             # remove padding
             a = dict_["boxes"]
             dict_["boxes"] = a[~torch.all(torch.eq(a,tensor([0.,0.,0.,0.], device=a.device)), dim=1)]
@@ -97,10 +98,12 @@ class RCNNAdapter(Callback):
                 #print(u)
                 if len(u) == 0:
                     print("empty mask")
+                    empty = True
                     #dict_["masks"] = torch.empty([0,h,w], dtype=torch.uint8, device=a.device) # how to deal with empty mask?
                     dict_["masks"] = torch.zeros([0,h,w], dtype=torch.uint8, device=a.device)
                 else:
                     dict_["masks"] = torch.stack([torch.where(dict_["masks"]==m.item(),1,0) for m in u]) # better pytorch solution?
+            if empty: print(dict_)
             new_y.append(dict_)
         return [x1],[new_y] # xb,yb
     
