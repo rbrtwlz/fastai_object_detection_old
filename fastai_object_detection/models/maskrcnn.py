@@ -38,7 +38,7 @@ def get_MaskRCNN(arch_str, num_classes, pretrained=False, pretrained_backbone=Tr
                     module.eps = 0.0
                     
         except Exception as e: 
-            print(e)            
+            #print(e)            
             print("No pretrained coco model found for maskrcnn_"+arch_str)
             print("This does not affect the backbone.")
             
