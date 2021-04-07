@@ -87,6 +87,7 @@ class RCNNAdapter(Callback):
             # remove padding
             a = dict_["boxes"]
             dict_["boxes"] = a[~torch.all(torch.eq(a,tensor([0.,0.,0.,0.], device=a.device)), dim=1)]
+            box_before = dict_["boxes"]
             a = dict_["labels"]
             dict_["labels"] = a[a!=self.na_idx]
             # scale back
@@ -104,6 +105,7 @@ class RCNNAdapter(Callback):
                 else:
                     dict_["masks"] = torch.stack([torch.where(dict_["masks"]==m.item(),1,0) for m in u]) # better pytorch solution?
             if empty: print(dict_)
+            if empty: print("box before:"+box_before)
             new_y.append(dict_)
         return [x1],[new_y] # xb,yb
     
