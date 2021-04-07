@@ -97,6 +97,8 @@ class RCNNAdapter(Callback):
                 else:
                     m = dict_["masks"]
                     m = torch.stack([torch.where(m[i]==i+1,1,0) for i in range(len(boxes))]) # better pytorch solution?
+                    print("binary masks")
+                    print(m.shape)
                     #dict_["masks"] = torch.stack([torch.where(dict_["masks"]==m.item(),1,0) for m in u]) 
 
                     # there are sometimes issues when using crop as resize method, 
