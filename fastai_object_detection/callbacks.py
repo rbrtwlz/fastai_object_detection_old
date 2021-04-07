@@ -14,6 +14,7 @@ class RCNNAdapter(Callback):
         self.learn.save_yb = []
 
     def before_batch(self):
+        print("new batch")
         self.learn.save_xb = self.learn.xb
         self.learn.save_yb = self.learn.yb
         
