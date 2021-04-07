@@ -5,6 +5,13 @@ from fastai.torch_core import *
 __all__ = ['RCNNAdapter']
 
 
+from fastai.callback.all import *
+from fastai.torch_basics import *
+from fastai.torch_core import *
+
+__all__ = ['RCNNAdapter']
+
+
 class RCNNAdapter(Callback):
     
     def __init__(self, na_idx=0): self.na_idx = na_idx
@@ -19,8 +26,6 @@ class RCNNAdapter(Callback):
         self.learn.save_yb = self.learn.yb
         
         xb,yb = self.transform_batch(self.learn.xb[0], *self.learn.yb)
-        print("before_batch_after_transform")
-
         
         self.learn.xb = [xb[0],yb[0]]
         self.learn.yb = []        
@@ -89,6 +94,7 @@ class RCNNAdapter(Callback):
             # scale back
             dict_["boxes"] = (dict_["boxes"]+1)* (h/2) 
             boxes = dict_["boxes"]
+            print("boxes shape")
             print(boxes.shape)
             if with_mask:
                 if len(boxes) == 0:
@@ -96,8 +102,13 @@ class RCNNAdapter(Callback):
                 # mask to stacked binary masks
                 else:
                     m = dict_["masks"]
-                    m = torch.stack([torch.where(m[i]==i+1,1,0) for i in range(len(boxes))]) # better pytorch solution?
-                    print("binary masks")
+                    print("mask shape")
+                    print(m.shape)
+                    print("mask unique")
+                    print(str(m.unique()))
+                    m = torch.stack([torch.where(m==i+1,1,0) for i in range(len(boxes))]) # better pytorch solution?
+                    dict_["masks"] = m
+                    print("binary masks shape")
                     print(m.shape)
                     #dict_["masks"] = torch.stack([torch.where(dict_["masks"]==m.item(),1,0) for m in u]) 
 
@@ -109,13 +120,15 @@ class RCNNAdapter(Callback):
                     print(filt)
                     print("bbox before filter:")
                     print(dict_["boxes"])
-                    dict_["masks"] = dict_["masks"][filt,:,:]
+                    print(dict_["boxes"].shape)
+                    dict_["masks"] = dict_["masks"][filt]
                     dict_["labels"] = dict_["labels"][filt]
                     dict_["boxes"] = dict_["boxes"][filt]
                     print("bbox after filter")
                     print(dict_["boxes"])
                     print(dict_["boxes"].shape)
-                    
+                    print("mask shape after filter")
+                    print(dict_["masks"].shape)
                 #a = dict_["masks"]
                 #u = torch.unique(dict_["masks"])[1:]  this does not work if object covers whole image
                 #u = torch.unique(dict_["masks"])
@@ -132,4 +145,3 @@ class RCNNAdapter(Callback):
             #if empty: print(dict_)
             new_y.append(dict_)
         return [x1],[new_y] # xb,yb
-    
