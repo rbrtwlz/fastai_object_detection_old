@@ -21,7 +21,7 @@ class RCNNAdapter(Callback):
         self.learn.save_yb = []
 
     def before_batch(self):
-        print("before_batch")
+        #print("before_batch")
         self.learn.save_xb = self.learn.xb
         self.learn.save_yb = self.learn.yb
         
@@ -94,8 +94,8 @@ class RCNNAdapter(Callback):
             # scale back
             dict_["boxes"] = (dict_["boxes"]+1)* (h/2) 
             boxes = dict_["boxes"]
-            print("boxes shape")
-            print(boxes.shape)
+            #print("boxes shape")
+            #print(boxes.shape)
             if with_mask:
                 if len(boxes) == 0:
                     dict_["masks"] = torch.empty([0,h,w], dtype=torch.uint8, device=boxes.device)
