@@ -96,8 +96,10 @@ class RCNNAdapter(Callback):
                 if len(u) == 0:
                     print("empty mask")
                     empty = True
-                    #dict_["masks"] = torch.empty([0,h,w], dtype=torch.uint8, device=a.device) # how to deal with empty mask?
-                    dict_["masks"] = torch.zeros([0,h,w], dtype=torch.uint8, device=a.device)
+                    dict_["masks"] = torch.empty([0,h,w], dtype=torch.uint8, device=a.device) 
+                    # for wierd cases where bbox is very small and there are no segmentation pixels:
+                    dict_["boxes"] = torch.empty([0,4], device=a.device)
+                    dict_["labels"] = torch.empty([0], device=a.device)
                 else:
                     dict_["masks"] = torch.stack([torch.where(dict_["masks"]==m.item(),1,0) for m in u]) # better pytorch solution?
             if empty: print(dict_)
