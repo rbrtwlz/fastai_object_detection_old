@@ -14,10 +14,13 @@ class RCNNAdapter(Callback):
         self.learn.save_yb = []
 
     def before_batch(self):
+        print("before_batch")
         self.learn.save_xb = self.learn.xb
         self.learn.save_yb = self.learn.yb
         
         xb,yb = self.transform_batch(self.learn.xb[0], *self.learn.yb)
+        print("before_batch_after_transform")
+
         
         self.learn.xb = [xb[0],yb[0]]
         self.learn.yb = []        
