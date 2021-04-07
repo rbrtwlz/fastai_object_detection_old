@@ -83,11 +83,9 @@ class RCNNAdapter(Callback):
 
         new_y = []
         for dict_ in y:
-            empty = False
             # remove padding
             a = dict_["boxes"]
             dict_["boxes"] = a[~torch.all(torch.eq(a,tensor([0.,0.,0.,0.], device=a.device)), dim=1)]
-            box_before = dict_["boxes"]
             a = dict_["labels"]
             dict_["labels"] = a[a!=self.na_idx]
             # scale back
@@ -95,17 +93,18 @@ class RCNNAdapter(Callback):
             if with_mask:
                 # mask to stacked binary masks
                 a = dict_["masks"]
-                u = torch.unique(dict_["masks"])[1:]
+                #u = torch.unique(dict_["masks"])[1:]  this does not work if object covers whole image
+                u = torch.unique(dict_["masks"])
+                u = u[u!=0]
                 #print(u)
                 if len(u) == 0:
-                    print("empty mask")
-                    empty = True
+                    #print("empty mask")
+                    #empty = True
                     #dict_["masks"] = torch.empty([0,h,w], dtype=torch.uint8, device=a.device) # how to deal with empty mask?
                     dict_["masks"] = torch.zeros([0,h,w], dtype=torch.uint8, device=a.device)
                 else:
                     dict_["masks"] = torch.stack([torch.where(dict_["masks"]==m.item(),1,0) for m in u]) # better pytorch solution?
-            if empty: print(dict_)
-            if empty: print("box before:"+str(box_before))
+            #if empty: print(dict_)
             new_y.append(dict_)
         return [x1],[new_y] # xb,yb
     
