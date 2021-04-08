@@ -24,7 +24,7 @@ class CocoData():
     coco = None 
 
     @classmethod
-    def create(cls, ds_name, cat_list, data_path=None, with_mask=False, max_images=1000):
+    def create(cls, ds_name, cat_list, data_path=None, with_mask=False, max_images=1000, remove_crowded=True):
 
         path = Path(URLs.path(c_key='data'))/ds_name if data_path is None else Path(data_path)/ds_name
         path_images = path/"images"
@@ -50,7 +50,7 @@ class CocoData():
         cls.coco = COCO(annotation_file=str(path/annotations))
 
         # download images
-        cls._download_images(cat_list, path_images, max_images)
+        cls._download_images(cat_list, path_images, max_images, remove_crowded)
 
         # create dataframe
         df = cls._create_dataframe(path, cat_list, with_mask)
@@ -59,9 +59,7 @@ class CocoData():
 
 
     def get_path_df(ds_name, data_path=None):
-
         path = Path(URLs.path(c_key='data'))/ds_name if data_path is None else Path(data_path)/ds_name
-
         if path.is_dir():
             if (path/"df_train.csv").is_file():
                 return (path, pd.read_csv(path/"df_train.csv"))
@@ -78,7 +76,7 @@ class CocoData():
             return list(path.ls())
         else: print("Path "+str(path)+" does not exist.")
 
-            
+
     def remove(ds_name, data_path=None):
         path = Path(URLs.path(c_key='data'))/ds_name if data_path is None else Path(data_path)/ds_name
         if path.is_dir():
@@ -87,20 +85,17 @@ class CocoData():
         else:
             print("No dataset '"+str(path)+"' found.")
 
-            
+
     def show_examples(ds_name, data_path=None, n=3):
         _, df = CocoData.get_path_df(ds_name, data_path=data_path) 
-
         img_ids = [i for i in df.image_id.unique()]
         shuffle(img_ids)
         with_mask = "mask_path" in df.columns
         from matplotlib import cm
-
         # transparent, blue, red, yellow, green, orange, black  
         # if more than 6 objects, rest is black
         colors_cmap = ["#ffffff99", "#0000ffcc", "#ff0000cc","#ffff00cc", "#4bdd75cc", "#bd6914cc", "#000000cc"] 
         cmap1 = ListedColormap(colors_cmap)
-
         for img_id in img_ids[:n]:
             filt = df.image_id == img_id
             img_path = df.loc[filt,"image_path"].values[0]
@@ -110,7 +105,6 @@ class CocoData():
             if with_mask:
                 mask_path = df.loc[filt,"mask_path"].values[0]
                 mask = PILMask.create(mask_path)
-
             fig,ax = plt.subplots(figsize=(8,8))
             TensorImage(img).show(ax=ax)
             if with_mask:
@@ -131,7 +125,7 @@ class CocoData():
         Path(zip_fn).unlink()
 
 
-    def _download_images(cat_list, path_images, max_images):
+    def _download_images(cat_list, path_images, max_images, remove_crowded):
         cat_ids = CocoData.coco.getCatIds(catNms=cat_list);
         idx2cat = {e['id']:e['name'] for e in CocoData.coco.loadCats(CocoData.coco.getCatIds())}
         img_id2fn = {}
@@ -142,15 +136,23 @@ class CocoData():
         for i in mb: 
             c_id = cat_ids[i]
             print("Downloading images of category "+idx2cat[c_id])
-            if max_images is None:
-                img_ids = CocoData.coco.getImgIds(catIds=c_id)
-            else:
-                img_ids = CocoData.coco.getImgIds(catIds=c_id)[0:max_images]
+            img_ids = CocoData.coco.getImgIds(catIds=c_id)
+            # small function to filter images with crowded objects
+            def _f(iid):
+                annos = CocoData.coco.loadAnns(CocoData.coco.getAnnIds(imgIds=iid))
+                annos = [a for a in annos if idx2cat[a["category_id"]] in cat_list]
+                is_crowd = [a["iscrowd"] for a in annos]
+                return 1 in is_crowd
+            if remove_crowded:
+                img_ids = [i for i in img_ids if not _f(i)]
+            if max_images is not None:
+                img_ids = img_ids[:max_images]
             for i in img_ids: 
                 img_id2fn[i] = path_images/(str(i).zfill(12)+".jpg")
             for i in progress_bar(range(len(img_ids)), parent=mb):
                 with contextlib.redirect_stdout(io.StringIO()):
                     CocoData.coco.download(path_images, [img_ids[i]])
+
         print(len([fn for fn in path_images.ls()]), "images downloaded.")
 
 
