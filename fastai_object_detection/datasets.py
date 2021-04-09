@@ -193,6 +193,7 @@ class CocoData():
                 mask = np.zeros(CocoData.coco.annToMask(annos[0]).shape, dtype=np.uint8)
                 for j,p_idx in enumerate(df_mask_pixel_idx):
                     mask += CocoData.coco.annToMask(annos[j]) * p_idx
+                    mask[mask>p_idx] = p_idx # for overlapping parts
                 Image.fromarray(mask).save(mask_path)
 
                 df = pd.DataFrame({"image_id":df_img_id, "image_path":df_img_path, 
