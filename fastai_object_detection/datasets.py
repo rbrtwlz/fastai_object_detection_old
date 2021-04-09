@@ -171,6 +171,9 @@ class CocoData():
             annos = CocoData.coco.loadAnns(CocoData.coco.getAnnIds(imgIds=img_id))
             # remove annotations of other labels 
             annos = [a for a in annos if idx2cat[a["category_id"]] in cat_list]
+            # sort by area
+            area_dict = {a["area"]:a for a in annos}
+            annos = [area_dict[k] for k in sorted(area_dict, reverse=True)]
 
             n_objs = len(annos)
 
