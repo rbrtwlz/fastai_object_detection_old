@@ -187,20 +187,21 @@ class CocoData():
 
             df_img_id = [img_id] * n_objs
             img_path = img_id2fn[img_id]
-            df_img_path = [img_path] * n_objs
+            df_img_path = [str(img_path)] * n_objs
 
             if with_mask:
-                mask_path = path_masks/(img_path.stem+".png") # save mask always as png
-                df_mask_path = [mask_path] * n_objs
-                df_mask_pixel_idx = [i for i in range(1,n_objs+1)]
+                df_mask_path = [] 
+                df_obj_ids = [i for i in range(n_objs)]
                 mask = np.zeros(CocoData.coco.annToMask(annos[0]).shape, dtype=np.uint8)
-                for j,p_idx in enumerate(df_mask_pixel_idx):
-                    mask += CocoData.coco.annToMask(annos[j]) * p_idx
-                    mask[mask>p_idx] = p_idx # for overlapping parts
-                Image.fromarray(mask).save(mask_path)
+                for o_id in df_obj_ids:
+                    mask = CocoData.coco.annToMask(annos[o_id]) #* p_idx
+                    #mask[mask>p_idx] = p_idx # for overlapping parts
+                    mask_path = path_masks/(img_path.stem+"_"+str(o_id)+".png") # save mask always as png
+                    Image.fromarray(mask).save(mask_path)
+                    df_mask_path.append(str(mask_path))
 
                 df = pd.DataFrame({"image_id":df_img_id, "image_path":df_img_path, 
-                                   "mask_path":df_mask_path, "mask_pixel_idx":df_mask_pixel_idx, 
+                                   "mask_path":df_mask_path, "object_id":df_obj_ids, 
                                    "x_min":df_x_mins, "y_min":df_y_mins, "x_max":df_x_maxs, "y_max":df_y_maxs,
                                    "class_name":df_class_names})
             else:
