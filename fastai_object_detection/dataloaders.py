@@ -1,6 +1,59 @@
 from fastai.vision.all import *
+#from fastai.torch_core import merge
 
 __all__ = ['ObjectDetectionDataLoaders']
+
+
+class TensorBinMasks(TensorImageBase):
+    def show(self, ctx=None, **kwargs):
+        return show_binmask(self,ctx=ctx, **{**self._show_args, **kwargs})
+
+@delegates(plt.Axes.imshow, keep=True, but=['shape', 'imlim'])
+def show_binmask(im, ax=None, figsize=None, title=None, ctx=None, **kwargs):
+    if hasattrs(im, ('data','cpu','permute')):
+        im = im.data.cpu()
+    if not isinstance(im,np.ndarray): im=array(im)
+    ax = ifnone(ax,ctx)
+    if figsize is None: figsize = (_fig_bounds(im.shape[0]), _fig_bounds(im.shape[1]))
+    if ax is None: _,ax = plt.subplots(figsize=figsize)
+    for m in im:
+        c = (np.random.random(3) * 0.6 + 0.4) 
+        #draw_mask(ax, m, c)
+        color_mask = np.ones((*m.shape, 3)) * c
+        ax.imshow(np.dstack((color_mask, m * 0.5)))
+        ax.contour(m, colors=[color_mask[0, 0, :]], alpha=0.4)
+    if title is not None: ax.set_title(title)
+    ax.axis('off')
+    return ax
+
+def _fig_bounds(x):
+    r = x//32
+    return min(5, max(1,r))
+
+def BinaryMasksBlock():
+    "A `TransformBlock` for binary masks"
+    return TransformBlock(type_tfms=lambda x: tuple(apply(PILMask.create,x)), batch_tfms=IntToFloatTensor)
+
+def _bin_mask_stack_and_padding(t, pad_idx=0):
+    stacked_masks = [torch.stack(t[i][1], dim=0) for i in range(len(t))]
+    imgs = [t[i][0] for i in range(len(t))]
+    bboxes = [t[i][2] for i in range(len(t))]
+    labels = [t[i][3] for i in range(len(t))]
+    samples = L(t for t in zip(imgs,stacked_masks,bboxes,labels))
+    samples = [(s[0], *_clip_remove_empty_with_mask(*s[1:])) for s in samples]
+    max_len = max([len(s[3]) for s in samples])
+    def _f(img,bin_mask,bbox,lbl):
+        bin_mask = torch.cat([bin_mask,bin_mask.new_zeros(max_len-bin_mask.shape[0], bin_mask.shape[-2], bin_mask.shape[-1])])
+        bbox = torch.cat([bbox,bbox.new_zeros(max_len-bbox.shape[0], 4)])
+        lbl  = torch.cat([lbl,lbl.new_zeros(max_len-lbl.shape[0])+pad_idx])
+        return img,TensorBinMasks(bin_mask),bbox,lbl
+    return [_f(*s) for s in samples]
+    
+def _clip_remove_empty_with_mask(bin_mask, bbox, label):
+    bbox = torch.clamp(bbox, -1, 1)
+    empty = ((bbox[...,2] - bbox[...,0])*(bbox[...,3] - bbox[...,1]) <= 0.)
+    return (bin_mask[~empty], bbox[~empty], label[~empty])
+
 
 class ObjectDetectionDataLoaders(DataLoaders):
     "Basic wrapper around `DataLoader`s with factory method for object dections problems"
@@ -8,13 +61,13 @@ class ObjectDetectionDataLoaders(DataLoaders):
     df = pd.DataFrame()
     img_id_col, img_path_col, class_col = "","","" 
     bbox_cols = []
-    mask_path_col,mask_pixel_idx_col = "",""
+    mask_path_col,object_id_col = "",""
 
     @classmethod
     @delegates(DataLoaders.from_dblock)
     def from_df(cls, df, valid_pct=0.2, img_id_col="image_id", img_path_col="image_path",
                 bbox_cols=["x_min", "y_min", "x_max", "y_max"], class_col="class_name",
-                mask_path_col="mask_path", mask_pixel_idx_col="mask_pixel_idx",
+                mask_path_col="mask_path", object_id_col="object_id",
                 seed=None, vocab=None, item_tfms=None, batch_tfms=None, **kwargs):
         
         if vocab is None :
@@ -23,7 +76,7 @@ class ObjectDetectionDataLoaders(DataLoaders):
         cls.df = df
         cls.img_id_col,cls.img_path_col,cls.class_col = img_id_col,img_path_col,class_col
         cls.bbox_cols = bbox_cols
-        cls.mask_path_col,cls.mask_pixel_idx_col = mask_path_col,mask_pixel_idx_col
+        cls.mask_path_col,cls.object_id_col = mask_path_col,object_id_col
         
         with_mask = mask_path_col in df.columns
         
@@ -43,14 +96,15 @@ class ObjectDetectionDataLoaders(DataLoaders):
             
         else:            
             dblock = DataBlock(
-                blocks=(ImageBlock(cls=PILImage), MaskBlock, BBoxBlock, BBoxLblBlock(vocab=vocab, add_na=True)),
+                blocks=(ImageBlock(cls=PILImage), BinaryMasksBlock, 
+                        BBoxBlock, BBoxLblBlock(vocab=vocab, add_na=True)),
                 n_inp=1,
                 splitter=RandomSplitter(valid_pct),
                 get_items=cls._get_images,
-                get_y=[cls._get_mask, cls._get_bboxes, cls._get_labels],
-                item_tfms=item_tfms,#method='pad', pad_mode='zeros'
-                batch_tfms=batch_tfms)
-            res = cls.from_dblock(dblock, df, path=".", before_batch=[cls._bb_pad_with_mask],**kwargs)
+                get_y=[cls._get_masks, cls._get_bboxes, cls._get_labels],
+                item_tfms=item_tfms,
+                batch_tfms=[TensorBinMasks2TensorMask(), *batch_tfms])
+            res = cls.from_dblock(dblock, df, path=".", before_batch=[_bin_mask_stack_and_padding],**kwargs)
             
         return res
     
@@ -79,24 +133,15 @@ class ObjectDetectionDataLoaders(DataLoaders):
         labels = [l for l in df.loc[filt, class_col]]
         return labels
     
-    def _get_mask(fn):
+    def _get_masks(fn):
         df = ObjectDetectionDataLoaders.df
         img_path_col = ObjectDetectionDataLoaders.img_path_col
         mask_path_col = ObjectDetectionDataLoaders.mask_path_col
         
-        filt = df[img_path_col] == fn #Path(fn)
-        mask_path = [m for m in df.loc[filt, mask_path_col]]
-        #print(mask_path[0])
-        return mask_path[0]
-    
-    def _bb_pad_with_mask(samples, pad_idx=0):
-        samples = [(s[0],s[1], *clip_remove_empty(*s[2:])) for s in samples]
-        max_len = max([len(s[3]) for s in samples])
-        def _f(img,mask,bbox,lbl):
-            bbox = torch.cat([bbox,bbox.new_zeros(max_len-bbox.shape[0], 4)])
-            lbl  = torch.cat([lbl, lbl.new_zeros(max_len-lbl.shape[0])+pad_idx])
-            return img,mask,bbox,lbl
-        return [_f(*s) for s in samples]
+        filt = df[img_path_col] == fn
+        mask_paths = [m for m in df.loc[filt, mask_path_col]]
+        return mask_paths
+
     
 """    
 class ObjectDetectionDataLoaders(DataLoaders):
