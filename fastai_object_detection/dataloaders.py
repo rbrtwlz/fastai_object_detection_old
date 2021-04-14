@@ -30,6 +30,7 @@ def _fig_bounds(x):
     r = x//32
     return min(5, max(1,r))
 
+
 def BinaryMasksBlock():
     "A `TransformBlock` for binary masks"
     return TransformBlock(type_tfms=lambda x: tuple(apply(PILMask.create,x)), batch_tfms=IntToFloatTensor)
@@ -55,6 +56,13 @@ def _clip_remove_empty_with_mask(bin_mask, bbox, label):
     return (bin_mask[~empty], bbox[~empty], label[~empty])
 
 
+class TensorBinMasks2TensorMask(Transform):
+    def encodes(self, x:TensorBinMasks):
+        return TensorMask(x)
+    def decodes(self, x:TensorMask):
+        return TensorBinMasks(x)
+
+    
 class ObjectDetectionDataLoaders(DataLoaders):
     "Basic wrapper around `DataLoader`s with factory method for object dections problems"
  
