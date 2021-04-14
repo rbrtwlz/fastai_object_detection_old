@@ -108,7 +108,7 @@ class maskrcnn_learner(Learner):
     
     
     def show_results(self, items, max_n=9, **kwargs):
-        inputs, masks, bboxes, labels, scores  = get_preds(self, items=items, box_score_thresh=0.6)
+        inputs, masks, bboxes, labels, scores  = self.get_preds(self, items=items, box_score_thresh=0.6)
         #idx = 10
         for idx in range(len(inputs)):
             if idx >= max_n: break
