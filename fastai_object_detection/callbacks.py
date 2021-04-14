@@ -5,12 +5,6 @@ from fastai.torch_core import *
 __all__ = ['RCNNAdapter']
 
 
-from fastai.callback.all import *
-from fastai.torch_basics import *
-from fastai.torch_core import *
-
-__all__ = ['RCNNAdapter']
-
 class RCNNAdapter(Callback):
     
     def __init__(self, na_idx=0): self.na_idx = na_idx
@@ -63,61 +57,34 @@ class RCNNAdapter(Callback):
         yb = [*yb]
         
         # check if with or without mask
-        if len(yb) == 3: with_mask=True
-        else: with_mask=False
+        with_mask = len(yb) == 3
 
         bs,c,h,w = x1.shape
+        dev = x1.device
 
         y={}
-        if with_mask:
-            y["masks"] = [m for m in yb[0]] # len: bs
-            y["boxes"] = [b for b in yb[1]] # len: bs
-            y["labels"] = [l for l in yb[2]] # len: bs
-        else:
-            y["boxes"] = [b for b in yb[0]] # len: bs
-            y["labels"] = [l for l in yb[1]] # len: bs
+        
+        keys = ["masks", "boxes", "labels"] if with_mask else ["boxes", "labels"]
+        for i,k in enumerate(keys):
+            y[k] = [e for e in yb[i]]
             
         y = [dict(zip(y,t)) for t in zip(*y.values())] # dict of lists to list of dicts
 
-        new_y = []
-        for dict_ in y:
-            #empty=False
+        #new_y = []
+        for d in y:
             # remove padding
-            a = dict_["boxes"]
-            dict_["boxes"] = a[~torch.all(torch.eq(a,tensor([0.,0.,0.,0.], device=a.device)), dim=1)]
-            a = dict_["labels"]
-            dict_["labels"] = a[a!=self.na_idx]
-            # scale back
-            dict_["boxes"] = (dict_["boxes"]+1)* (h/2) 
-            boxes = dict_["boxes"]
-            if with_mask:
-                if len(boxes) == 0:
-                    dict_["masks"] = torch.empty([0,h,w], dtype=torch.uint8, device=boxes.device)
-                # mask to stacked binary masks
-                else:
-                    m = dict_["masks"]
-                    #print("mask shape")
-                    #print(m.shape)
-                    #print("mask unique")
-                    #print(str(m.unique()))
-                    m = torch.stack([torch.where(m==i+1,1,0) for i in range(len(boxes))]) # better pytorch solution?
-                    dict_["masks"] = m
-                    #print("binary masks shape")
-                    #print(m.shape)
+            filt = d["labels"]!=self.na_idx
+            for k in keys:
+                d[k] = d[k][filt]
+            
+            # scale bboxes back
+            d["boxes"] = (d["boxes"]+1.)*tensor([w,h,w,h], device=dev)*0.5
 
-                    filt = m.sum(dim=-1).sum(dim=-1)!=0 # find empty binary segmentation masks
-                    #print("filter:")
-                    #print(filt)
-                    #print("bbox before filter:")
-                    #print(dict_["boxes"])
-                    #print(dict_["boxes"].shape)
-                    dict_["masks"] = dict_["masks"][filt]
-                    dict_["labels"] = dict_["labels"][filt]
-                    dict_["boxes"] = dict_["boxes"][filt]
-                    #print("bbox after filter")
-                    #print(dict_["boxes"])
-                    #print(dict_["boxes"].shape)
-                    #print("mask shape after filter")
-                    #print(dict_["masks"].shape)
-            new_y.append(dict_)
-        return [x1],[new_y] # xb,yb
+            if with_mask:
+                # filter out objects with empty masks
+                filt = d["masks"].sum(dim=-1).sum(dim=-1)==0 
+                for k in keys:
+                    d[k] = d[k][~filt]
+    
+            #new_y.append(d)
+        return [x1],[y] # xb,yb
