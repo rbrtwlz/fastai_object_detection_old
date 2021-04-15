@@ -76,7 +76,7 @@ class ObjectDetectionDataLoaders(DataLoaders):
     def from_df(cls, df, valid_pct=0.2, img_id_col="image_id", img_path_col="image_path",
                 bbox_cols=["x_min", "y_min", "x_max", "y_max"], class_col="class_name",
                 mask_path_col="mask_path", object_id_col="object_id",
-                seed=None, vocab=None, item_tfms=None, batch_tfms=None, **kwargs):
+                seed=None, vocab=None, add_na=True, item_tfms=None, batch_tfms=None, **kwargs):
         
         if vocab is None :
                 vocab = [c for c in df[class_col].unique()]
@@ -93,7 +93,7 @@ class ObjectDetectionDataLoaders(DataLoaders):
             
         if not with_mask:
             dblock = DataBlock(
-                blocks=(ImageBlock(cls=PILImage), BBoxBlock, BBoxLblBlock(vocab=vocab, add_na=True)),
+                blocks=(ImageBlock(cls=PILImage), BBoxBlock, BBoxLblBlock(vocab=vocab, add_na=add_na)),
                 n_inp=1,
                 splitter=RandomSplitter(valid_pct),
                 get_items=cls._get_images,
