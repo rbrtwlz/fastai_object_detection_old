@@ -105,7 +105,7 @@ class ObjectDetectionDataLoaders(DataLoaders):
         else:            
             dblock = DataBlock(
                 blocks=(ImageBlock(cls=PILImage), BinaryMasksBlock, 
-                        BBoxBlock, BBoxLblBlock(vocab=vocab, add_na=True)),
+                        BBoxBlock, BBoxLblBlock(vocab=vocab, add_na=add_na)),
                 n_inp=1,
                 splitter=RandomSplitter(valid_pct),
                 get_items=cls._get_images,
