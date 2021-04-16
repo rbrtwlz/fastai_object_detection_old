@@ -76,6 +76,11 @@ class RCNNAdapter(Callback):
             filt = d["labels"]!=self.na_idx
             for k in keys:
                 d[k] = d[k][filt]
+                
+            # remove empty bboxes
+            filt = d["boxes"]!=tensor([0.,0.,0.,0.], device=dev)
+            for k in keys:
+                d[k] = d[k][filt]
             
             # scale bboxes back
             d["boxes"] = (d["boxes"]+1.)*tensor([w,h,w,h], device=dev)*0.5
