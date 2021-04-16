@@ -78,9 +78,11 @@ class RCNNAdapter(Callback):
                 d[k] = d[k][filt]
                 
             # remove empty bboxes
-            filt = torch.eq(d["boxes"], tensor([[0.,0.,0.,0.]], device=dev)).all(dim=1)
+            filt = (d["boxes"][:,0]-d["boxes"][:,2])*(d["boxes"][:,1]-d["boxes"][:,3])!=0
+
+            #filt = torch.eq(d["boxes"], tensor([[0.,0.,0.,0.]], device=dev)).all(dim=1)
             for k in keys:
-                d[k] = d[k][~filt]
+                d[k] = d[k][filt]
             
             # scale bboxes back
             d["boxes"] = (d["boxes"]+1.)*tensor([w,h,w,h], device=dev)*0.5
