@@ -18,7 +18,11 @@ def get_MaskRCNN(arch_str, num_classes, pretrained=False, pretrained_backbone=Tr
     #if pretrained: pretrained_backbone = False
         
     backbone = resnet_fpn_backbone(arch_str, pretrained=pretrained_backbone, trainable_layers=trainable_layers)
-    model = MaskRCNN(backbone, num_classes, **kwargs)
+    model = MaskRCNN(backbone, 
+                     num_classes, 
+                     image_mean = [0.0, 0.0, 0.0], # already normalized by fastai
+                     image_std = [1.0, 1.0, 1.0],
+                     **kwargs)
     
     if pretrained:
         try:
