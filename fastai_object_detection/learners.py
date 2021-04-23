@@ -60,7 +60,7 @@ class maskrcnn_learner(Learner):
     def __init__(self, dls, model, cbs=None, pretrained=True, pretrained_backbone=True, **kwargs):
         if cbs is not None: cbs = L(RCNNAdapter())+L(cbs)
         else: cbs = [RCNNAdapter()]
-        #model = model(num_classes=len(dls.vocab), pretrained=pretrained, pretrained_backbone=pretrained_backbone)
+        model = model(num_classes=len(dls.vocab), pretrained=pretrained, pretrained_backbone=pretrained_backbone)
         super().__init__(dls, model, loss_func=noop, cbs=cbs, **kwargs)
         
     def get_preds(self, items, item_tfms=None, batch_tfms=None, box_score_thresh=0.05, bin_mask_thresh=None):
