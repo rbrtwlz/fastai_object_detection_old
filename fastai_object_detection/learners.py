@@ -56,15 +56,14 @@ class fasterrcnn_learner(Learner):
                                                   for l in labels[idx]]).show(ax)
         
 
-        
 class maskrcnn_learner(Learner):
     def __init__(self, dls, model, cbs=None, pretrained=True, pretrained_backbone=True, **kwargs):
         if cbs is not None: cbs = L(RCNNAdapter())+L(cbs)
         else: cbs = [RCNNAdapter()]
-        model = model(num_classes=len(dls.vocab), pretrained=pretrained, pretrained_backbone=pretrained_backbone)
+        #model = model(num_classes=len(dls.vocab), pretrained=pretrained, pretrained_backbone=pretrained_backbone)
         super().__init__(dls, model, loss_func=noop, cbs=cbs, **kwargs)
         
-    def get_preds(self, items, item_tfms=None, batch_tfms=None, box_score_thresh=0.05):
+    def get_preds(self, items, item_tfms=None, batch_tfms=None, box_score_thresh=0.05, bin_mask_thresh=None):
         if item_tfms is None: item_tfms = [Resize(800, method="pad", pad_mode="zeros")]
         dblock = DataBlock(
             blocks=(ImageBlock(cls=PILImage)),
@@ -96,19 +95,25 @@ class maskrcnn_learner(Learner):
         boxes = [p["boxes"][filt[i]].cpu() for i,p in enumerate(preds)]
         labels = [p["labels"][filt[i]].cpu() for i,p in enumerate(preds)]
         scores = [p["scores"][filt[i]].cpu() for i,p in enumerate(preds)]
-
-        # generate masks
-        for i,m in enumerate(masks):
-            background = torch.ones([1,1,m.shape[-2],m.shape[-1]]) * 0.5 # threshold for mask is 0.5
-            m = torch.cat([background, m])
-            masks[i] = torch.argmax(m, dim=0).squeeze(0)
-
+        
+        print(len(masks))
+        # by default returns masks in [N, 1, H, W] with activations
+        # if you want binary masks in [N, H, W] set bin_mask_thresh 
+        if bin_mask_thresh is not None:
+            for i,m in enumerate(masks):
+                masks[i] = torch.where(m > bin_mask_thresh, 1, 0).squeeze(1)
 
         return inputs, masks, boxes, labels, scores
     
     
-    def show_results(self, items, max_n=9, **kwargs):
-        inputs, masks, bboxes, labels, scores  = self.get_preds(items=items, box_score_thresh=0.6)
+    def show_results(self, items, max_n=9, box_score_thresh=0.6, bin_mask_thresh=0.5, **kwargs):
+        inputs, masks, bboxes, labels, scores  = self.get_preds(items=items, box_score_thresh=box_score_thresh)
+        
+        for i,m in enumerate(masks):
+            background = torch.ones([1,1,m.shape[-2],m.shape[-1]]) * bin_mask_thresh 
+            m = torch.cat([background, m])
+            masks[i] = torch.argmax(m, dim=0).squeeze(0)
+        
         #idx = 10
         for idx in range(len(inputs)):
             if idx >= max_n: break
