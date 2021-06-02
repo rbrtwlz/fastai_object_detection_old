@@ -27,7 +27,7 @@ learn.fit_one_cycle(1, 1e-04)
 All you need is a pandas `DataFrame` containing the data for each object in the images. 
 In default setting follwing columns are required:
 
-For the image, which contains the object:
+For the image, which contains the object(s):
 * `image_id`
 * `image_path`
 
