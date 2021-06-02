@@ -5,11 +5,13 @@ __all__ = ['ObjectDetectionDataLoaders']
 
 
 class TensorBinMasks(TensorImageBase):
+    "Tensor class for binary mask representation"
     def show(self, ctx=None, **kwargs):
         return show_binmask(self,ctx=ctx, **{**self._show_args, **kwargs})
 
 @delegates(plt.Axes.imshow, keep=True, but=['shape', 'imlim'])
 def show_binmask(im, ax=None, figsize=None, title=None, ctx=None, **kwargs):
+    "Function to show binary masks with matplotlib"
     if hasattrs(im, ('data','cpu','permute')):
         im = im.data.cpu()
     if not isinstance(im,np.ndarray): im=array(im)
@@ -36,6 +38,7 @@ def BinaryMasksBlock():
     return TransformBlock(type_tfms=lambda x: tuple(apply(PILMask.create,x)), batch_tfms=IntToFloatTensor)
 
 def _bin_mask_stack_and_padding(t, pad_idx=0):
+    "Function for padding to create batches when number of objects is different"
     stacked_masks = [torch.stack(t[i][1], dim=0) for i in range(len(t))]
     imgs = [t[i][0] for i in range(len(t))]
     bboxes = [t[i][2] for i in range(len(t))]
@@ -57,6 +60,7 @@ def _clip_remove_empty_with_mask(bin_mask, bbox, label):
 
 
 class TensorBinMasks2TensorMask(Transform):
+    "Class to transform binary masks to fastai `TensorMask` class in to mask fastai's transforms available"
     def encodes(self, x:TensorBinMasks):
         return TensorMask(x)
     def decodes(self, x:TensorMask):
@@ -65,7 +69,6 @@ class TensorBinMasks2TensorMask(Transform):
     
 class ObjectDetectionDataLoaders(DataLoaders):
     "Basic wrapper around `DataLoader`s with factory method for object dections problems"
- 
     df = pd.DataFrame()
     img_id_col, img_path_col, class_col = "","","" 
     bbox_cols = []
@@ -150,66 +153,3 @@ class ObjectDetectionDataLoaders(DataLoaders):
         mask_paths = [m for m in df.loc[filt, mask_path_col]]
         return mask_paths
 
-    
-"""    
-class ObjectDetectionDataLoaders(DataLoaders):
-    
-    df = pd.DataFrame()
-    img_id_col, img_path_col, class_col = "","","" 
-    bbox_cols = []
-
-    "Basic wrapper around `DataLoader`s with factory methods for object dections problems"
-    @classmethod
-    @delegates(DataLoaders.from_dblock)
-    def from_df(cls, df, valid_pct=0.2, img_id_col="image_id", img_path_col="image_path",
-                bbox_cols=["x_min", "y_min", "x_max", "y_max"], class_col="class_name",
-                seed=None, vocab=None, item_tfms=None, batch_tfms=None, **kwargs):
-        
-        if vocab is None :
-                vocab = [c for c in df[class_col].unique()]
-
-        cls.df = df
-        cls.img_id_col,cls.img_path_col,cls.class_col = img_id_col,img_path_col,class_col
-        cls.bbox_cols = bbox_cols
-        
-        if item_tfms is None:
-            item_tfms = [Resize(800)]
-
-        dblock = DataBlock(
-            blocks=(ImageBlock(cls=PILImage), BBoxBlock, BBoxLblBlock(vocab=vocab, add_na=True)),
-            n_inp=1,
-            splitter=RandomSplitter(valid_pct),
-            get_items=cls._get_images,
-            get_y=[cls._get_bboxes, cls._get_labels],
-            item_tfms=item_tfms,
-            batch_tfms=batch_tfms)
-        
-        res = cls.from_dblock(dblock, df, path=".", **kwargs)
-        return res
-    
-    def _get_images(df):
-        img_path_col = ObjectDetectionDataLoaders.img_path_col
-        
-        fns = L(fn for fn in df[img_path_col].unique())
-        return fns
-
-    def _get_bboxes(fn):
-        df = ObjectDetectionDataLoaders.df
-        img_path_col = ObjectDetectionDataLoaders.img_path_col
-        x_min, y_min, x_max, y_max = ObjectDetectionDataLoaders.bbox_cols
-        
-        filt = df[img_path_col] == fn #Path(fn)
-        bboxes = [list(i) for i in zip(df.loc[filt,x_min], df.loc[filt,y_min], 
-                                       df.loc[filt,x_max], df.loc[filt,y_max])]
-        return bboxes
-
-    def _get_labels(fn):
-        df = ObjectDetectionDataLoaders.df
-        img_path_col = ObjectDetectionDataLoaders.img_path_col
-        class_col = ObjectDetectionDataLoaders.class_col
-        
-        filt = df[img_path_col] == fn #Path(fn)
-        labels = [l for l in df.loc[filt, class_col]]
-        return labels
-        
-"""
