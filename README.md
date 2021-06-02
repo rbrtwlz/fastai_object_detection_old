@@ -42,7 +42,7 @@ The object's class/label:
 
 If you want to use MaskRCNN for instance segementation, following columns are additionally needed:
 * `mask_path`
-* `mask_pixel_idx` (background is 0, different objects in the same mask have different pixel indices, from 1 to number of objects)
+* `object_id` (background is 0, different objects in the same mask have different pixel indices, from 1 to number of objects)
 
 There are helper functions available, for example for adding the `image_path` by `image_id` or to change the bbox format from `xywh` to `x1y1x2y2`.
 
