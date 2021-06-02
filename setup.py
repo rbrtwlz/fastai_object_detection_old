@@ -8,5 +8,5 @@ setup(
     author_email='abitdevelopment@gmail.com',
     description='fastai extension for object detection',
     packages=find_packages(),    
-    install_requires = ['fastai/fastai', 'mean_average_precision @ git+https://github.com/bes-dev/mean_average_precision', 'pycocotools']
+    install_requires = ['fastai', 'mean_average_precision @ git+https://github.com/bes-dev/mean_average_precision', 'pycocotools']
 )
