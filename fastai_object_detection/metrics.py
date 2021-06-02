@@ -5,12 +5,13 @@ from mean_average_precision import MetricBuilder
 from fastai.metrics import Metric
 from fastai.torch_basics import *
 from fastai.torch_core import *
-from functools import partial
+#from functools import partial
 
 __all__ = ['mAP_at_IoU40', 'mAP_at_IoU50', 'mAP_at_IoU60', 'mAP_at_IoU70', 'mAP_at_IoU80', 'mAP_at_IoU90']
 
 
 class mAP_Metric():
+    "Metric to calculate mAP for different IoU thresholds"
     def __init__(self, iou_thresholds, name):
         self.__name__ = name
         self.iou_thresholds = iou_thresholds
@@ -40,7 +41,7 @@ class mAP_Metric():
         return [s for s in zip(pred_samples, targ_samples)]
 
     
-class AvgMetric_Copy(Metric):
+class AvgMetric_ObjectDetection(Metric):
     "Average the values of `func` taking into account potential different batch sizes"
     def __init__(self, func): self.func = func
     def reset(self): self.total,self.count = 0.,0
@@ -54,10 +55,10 @@ class AvgMetric_Copy(Metric):
     def name(self): return self.func.func.__name__ if hasattr(self.func, 'func') else  self.func.__name__
     
     
-mAP_at_IoU40 = AvgMetric_Copy(mAP_Metric(0.4, "mAP@IoU>0.4"))
-mAP_at_IoU50 = AvgMetric_Copy(mAP_Metric(0.5, "mAP@IoU>0.5"))
-mAP_at_IoU60 = AvgMetric_Copy(mAP_Metric(0.6, "mAP@IoU>0.6"))
-mAP_at_IoU70 = AvgMetric_Copy(mAP_Metric(0.7, "mAP@IoU>0.7"))
-mAP_at_IoU80 = AvgMetric_Copy(mAP_Metric(0.8, "mAP@IoU>0.8"))
-mAP_at_IoU90 = AvgMetric_Copy(mAP_Metric(0.9, "mAP@IoU>0.9"))
+mAP_at_IoU40 = AvgMetric_ObjectDetection(mAP_Metric(0.4, "mAP@IoU>0.4"))
+mAP_at_IoU50 = AvgMetric_ObjectDetection(mAP_Metric(0.5, "mAP@IoU>0.5"))
+mAP_at_IoU60 = AvgMetric_ObjectDetection(mAP_Metric(0.6, "mAP@IoU>0.6"))
+mAP_at_IoU70 = AvgMetric_ObjectDetection(mAP_Metric(0.7, "mAP@IoU>0.7"))
+mAP_at_IoU80 = AvgMetric_ObjectDetection(mAP_Metric(0.8, "mAP@IoU>0.8"))
+mAP_at_IoU90 = AvgMetric_ObjectDetection(mAP_Metric(0.9, "mAP@IoU>0.9"))
 
