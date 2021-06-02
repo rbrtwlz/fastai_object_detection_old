@@ -60,7 +60,7 @@ def _clip_remove_empty_with_mask(bin_mask, bbox, label):
 
 
 class TensorBinMasks2TensorMask(Transform):
-    "Class to transform binary masks to fastai `TensorMask` class in to mask fastai's transforms available"
+    "Class to transform binary masks to fastai's `TensorMask` class to make fastai's transforms available"
     def encodes(self, x:TensorBinMasks):
         return TensorMask(x)
     def decodes(self, x:TensorMask):
