@@ -7,6 +7,7 @@ from .callbacks import *
 __all__ = ['fasterrcnn_learner', 'maskrcnn_learner']
 
 class fasterrcnn_learner(Learner):
+    """ fastai-style learner to train fasterrcnn models """
     def __init__(self, dls, model, cbs=None, pretrained=True, pretrained_backbone=True, **kwargs):
         if cbs is not None: cbs = L(RCNNAdapter())+L(cbs)
         else: cbs = [RCNNAdapter()]
@@ -57,6 +58,7 @@ class fasterrcnn_learner(Learner):
         
 
 class maskrcnn_learner(Learner):
+    """ fastai-style learner to train maskrcnn models """
     def __init__(self, dls, model, cbs=None, pretrained=True, pretrained_backbone=True, **kwargs):
         if cbs is not None: cbs = L(RCNNAdapter())+L(cbs)
         else: cbs = [RCNNAdapter()]
