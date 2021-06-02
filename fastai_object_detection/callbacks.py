@@ -6,6 +6,8 @@ __all__ = ['RCNNAdapter']
 
 
 class RCNNAdapter(Callback):
+    '''Callback to convert batches from fastai's dataloader 
+    to the expected input of fasterrcnn/maskrcnn'''
     
     def __init__(self, na_idx=0): self.na_idx = na_idx
         
