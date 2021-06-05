@@ -8,8 +8,9 @@ __all__ = ['fasterrcnn_learner', 'maskrcnn_learner']
 
 def rcnn_split(m):
     "Default split of rcnn model between transform,backbone and rpn,roi_heads"
-    m = L(c for c in m.children())
-    return L(m[:2], m[2:]).map(params)
+    #m = L(c for c in m.children())
+    #return L(m[:2], m[2:]).map(params)
+    return L(m).map(params)
 
 
 class fasterrcnn_learner(Learner):
