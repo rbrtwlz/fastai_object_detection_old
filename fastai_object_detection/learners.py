@@ -26,13 +26,18 @@ class fasterrcnn_learner(Learner):
                    metrics=metrics, path=path, model_dir=model_dir, wd=wd, wd_bn_bias=wd_bn_bias, train_bn=train_bn,
                    moms=moms)
         
-    def get_preds(self, items=None, item_tfms=None, batch_tfms=None, box_score_thresh=0.05):
-        if item_tfms is None: item_tfms = [Resize(800)]
-        dblock = DataBlock(
-            blocks=(ImageBlock(cls=PILImage)),
-            item_tfms=item_tfms,
-            batch_tfms=batch_tfms)
-        test_dl = dblock.dataloaders(items).test_dl(items, bs=self.dls.bs)
+    def get_preds(self, items=None, item_tfms=None, batch_tfms=None, box_score_thresh=0.05, max_n=None):
+        
+        if items is not None:
+            if item_tfms is None: item_tfms = [Resize(800, method="pad", pad_mode="zeros")]
+            dblock = DataBlock(
+                blocks=(ImageBlock(cls=PILImage)),
+                item_tfms=item_tfms,
+                batch_tfms=batch_tfms)
+            test_dl = dblock.dataloaders(items).test_dl(items, bs=self.dls.bs)
+        else:
+            test_dl = self.dls.valid
+            
         inputs,preds = [],[]
         with torch.no_grad():
             for i,batch in enumerate(progress_bar(test_dl)):
@@ -40,6 +45,9 @@ class fasterrcnn_learner(Learner):
                 preds.append(self.model(*batch))
                 inputs.append(*batch)
                 self.model.train()
+                if max_n is not None:
+                    if len(inputs)>=max_n:
+                        break
         # preds: num_batches x bs x dict["boxes", "labels", "scores"]
         # flatten:
         preds = [i for p in preds for i in p]
@@ -58,8 +66,8 @@ class fasterrcnn_learner(Learner):
         return inputs, boxes, labels, scores
     
     
-    def show_results(self, items, max_n=9,  **kwargs):
-        inputs, bboxes, labels, scores  = self.get_preds(items=items, box_score_thresh=0.6)
+    def show_results(self, items=None, max_n=9, item_tfms=None, batch_tfms=None, box_score_thresh=0.6):
+        inputs, bboxes, labels, scores  = self.get_preds(items=items, box_score_thresh=box_score_thresh, max_n=max_n)
         #idx = 10
         for idx in range(len(inputs)):
             if idx >= max_n: break
