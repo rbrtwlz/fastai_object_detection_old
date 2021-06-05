@@ -6,6 +6,12 @@ from .callbacks import *
 
 __all__ = ['fasterrcnn_learner', 'maskrcnn_learner']
 
+def rcnn_split(m):
+    "Default split of rcnn model between transform,backbone and rpn,roi_heads"
+    m = L(c for c in m.children())
+    return L(m[:2], m[2:]).map(params)
+
+
 class fasterrcnn_learner(Learner):
     """ fastai-style learner to train fasterrcnn models """
     def __init__(self, dls, model, pretrained=True, pretrained_backbone=True, num_classes=None,
@@ -22,6 +28,8 @@ class fasterrcnn_learner(Learner):
             
         model = model(num_classes=num_classes, pretrained=pretrained, pretrained_backbone=pretrained_backbone, **kwargs)
         
+        if splitter is None:
+            splitter = rcnn_split
         #super().__init__(dls=dls, model=model, loss_func=loss_func, opt_func=opt_func, lr=lr, splitter=splitter, cbs=cbs,
         #           metrics=metrics, path=path, model_dir=model_dir, wd=wd, wd_bn_bias=wd_bn_bias, train_bn=train_bn,
         #           moms=moms)
