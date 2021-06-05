@@ -39,7 +39,7 @@ class fasterrcnn_learner(Learner):
         #           metrics=metrics, path=path, model_dir=model_dir, wd=wd, wd_bn_bias=wd_bn_bias, train_bn=train_bn,
         #           moms=moms)
         #learn.splitter=splitter
-        return learn
+        #return learn
         
     def get_preds(self, items=None, item_tfms=None, batch_tfms=None, box_score_thresh=0.05, max_n=None):
         
