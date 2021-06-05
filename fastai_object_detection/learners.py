@@ -71,11 +71,23 @@ class fasterrcnn_learner(Learner):
 
 class maskrcnn_learner(Learner):
     """ fastai-style learner to train maskrcnn models """
-    def __init__(self, dls, model, cbs=None, pretrained=True, pretrained_backbone=True, **kwargs):
-        if cbs is not None: cbs = L(RCNNAdapter())+L(cbs)
-        else: cbs = [RCNNAdapter()]
-        model = model(num_classes=len(dls.vocab), pretrained=pretrained, pretrained_backbone=pretrained_backbone)
-        super().__init__(dls, model, loss_func=noop, cbs=cbs, **kwargs)
+    def __init__(self, dls, model, pretrained=True, pretrained_backbone=True, num_classes=None,
+                 # learner args
+                 loss_func=noop, opt_func=Adam, lr=defaults.lr, splitter=None, cbs=None, metrics=None, path=None,
+                 model_dir='models', wd=None, wd_bn_bias=False, train_bn=True, moms=(0.95,0.85,0.95),
+                 # other model args
+                 **kwargs):    
+        
+        if num_classes is None: num_classes = len(dls.vocab)
+        
+        if cbs is None: cbs = [RCNNAdapter()]
+        else: cbs = L(RCNNAdapter())+L(cbs)
+            
+        model = model(num_classes=num_classes, pretrained=pretrained, pretrained_backbone=pretrained_backbone, **kwargs)
+        
+        super().__init__(dls=dls, model=model, loss_func=loss_func, opt_func=opt_func, lr=lr, splitter=splitter, cbs=cbs,
+                   metrics=metrics, path=path, model_dir=model_dir, wd=wd, wd_bn_bias=wd_bn_bias, train_bn=train_bn,
+                   moms=moms)
         
     def get_preds(self, items, item_tfms=None, batch_tfms=None, box_score_thresh=0.05, bin_mask_thresh=None):
         if item_tfms is None: item_tfms = [Resize(800, method="pad", pad_mode="zeros")]
