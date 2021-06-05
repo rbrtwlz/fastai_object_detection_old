@@ -22,6 +22,8 @@ class fasterrcnn_learner(Learner):
                  # other model args
                  **kwargs):
         
+        print("init")
+        
         if num_classes is None: num_classes = len(dls.vocab)
         
         if cbs is None: cbs = [RCNNAdapter()]
