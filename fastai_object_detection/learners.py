@@ -56,9 +56,10 @@ class fasterrcnn_learner(Learner):
         with torch.no_grad():
             for i,batch in enumerate(progress_bar(test_dl)):
                 self.model.eval()
-                print(*batch)
-                preds.append(self.model(*batch))
-                inputs.append(*batch)
+                preds.append(self.model(batch[0]))
+                inputs.append(batch[0])                
+                #preds.append(self.model(*batch))
+                #inputs.append(*batch)
                 self.model.train()
                 if max_n is not None:
                     if len(inputs)>=max_n:
