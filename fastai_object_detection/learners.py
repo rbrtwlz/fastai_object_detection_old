@@ -22,9 +22,13 @@ class fasterrcnn_learner(Learner):
             
         model = model(num_classes=num_classes, pretrained=pretrained, pretrained_backbone=pretrained_backbone, **kwargs)
         
-        super().__init__(dls=dls, model=model, loss_func=loss_func, opt_func=opt_func, lr=lr, splitter=splitter, cbs=cbs,
+        #super().__init__(dls=dls, model=model, loss_func=loss_func, opt_func=opt_func, lr=lr, splitter=splitter, cbs=cbs,
+        #           metrics=metrics, path=path, model_dir=model_dir, wd=wd, wd_bn_bias=wd_bn_bias, train_bn=train_bn,
+        #           moms=moms)
+        learn = Learner(dls=dls, model=model, loss_func=loss_func, opt_func=opt_func, lr=lr, splitter=splitter, cbs=cbs,
                    metrics=metrics, path=path, model_dir=model_dir, wd=wd, wd_bn_bias=wd_bn_bias, train_bn=train_bn,
                    moms=moms)
+        return learn
         
     def get_preds(self, items=None, item_tfms=None, batch_tfms=None, box_score_thresh=0.05, max_n=None):
         
