@@ -79,7 +79,7 @@ class ObjectDetectionDataLoaders(DataLoaders):
     def from_df(cls, df, valid_pct=0.2, img_id_col="image_id", img_path_col="image_path",
                 bbox_cols=["x_min", "y_min", "x_max", "y_max"], class_col="class_name",
                 mask_path_col="mask_path", object_id_col="object_id",
-                seed=None, vocab=None, add_na=True, item_tfms=None, batch_tfms=None, **kwargs):
+                seed=None, vocab=None, add_na=True, item_tfms=None, batch_tfms=None, debug=False, **kwargs):
         
         if vocab is None :
                 vocab = [c for c in df[class_col].unique()]
@@ -103,6 +103,7 @@ class ObjectDetectionDataLoaders(DataLoaders):
                 get_y=[cls._get_bboxes, cls._get_labels],
                 item_tfms=item_tfms,
                 batch_tfms=batch_tfms)
+            if debug: print(dblock.summary(df))
             res = cls.from_dblock(dblock, df, path=".", **kwargs)
             
         else:            
@@ -115,6 +116,7 @@ class ObjectDetectionDataLoaders(DataLoaders):
                 get_y=[cls._get_masks, cls._get_bboxes, cls._get_labels],
                 item_tfms=item_tfms,
                 batch_tfms=[TensorBinMasks2TensorMask(), *batch_tfms])
+            if debug: print(dblock.summary(df))
             res = cls.from_dblock(dblock, df, path=".", before_batch=[_bin_mask_stack_and_padding],**kwargs)
             
         return res
