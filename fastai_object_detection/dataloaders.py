@@ -1,6 +1,10 @@
 from fastai.vision.all import *
 #from fastai.torch_core import merge
 
+# temp bug fix
+# https://github.com/fastai/fastai/issues/3384
+TensorMultiCategory.register_func(Tensor.__getitem__, TensorMultiCategory, TensorBBox)
+
 __all__ = ['ObjectDetectionDataLoaders']
 
 
