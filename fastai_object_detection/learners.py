@@ -69,7 +69,7 @@ class fasterrcnn_learner(Learner):
         preds = [i for p in preds for i in p]
         inputs = [i for inp in inputs for i in inp]
         
-        preds = [torch.cat([p["boxes"],p["labels"].unsqueeze(1),p["scores"].unsqueeze(1)], dim=1) 
+        preds = [torch.cat([p["boxes"],p["labels"].unsqueeze(1),p["scores"].unsqueeze(1)], dim=1).cpu() 
                  for p in preds]
         
         # only preds with score > box_score_thresh
