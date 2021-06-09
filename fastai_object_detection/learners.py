@@ -40,8 +40,7 @@ class fasterrcnn_learner(Learner):
         #learn.splitter=splitter
         #return learn
         
-    def get_preds(self, items=None, item_tfms=None, batch_tfms=None, box_score_thresh=0.05, max_n=None):
-        
+    def get_preds(self, items=None, item_tfms=None, batch_tfms=None, box_score_thresh=0.05, max_n=None):        
         if items is not None:
             if item_tfms is None: item_tfms = [Resize(800, method="pad", pad_mode="zeros")]
             dblock = DataBlock(
@@ -50,19 +49,18 @@ class fasterrcnn_learner(Learner):
                 batch_tfms=batch_tfms)
             test_dl = dblock.dataloaders(items).test_dl(items, bs=self.dls.bs)
         else:
-            test_dl = self.dls.valid
+            test_dl = self.dls.valid.new(shuffle=True)
             
         inputs,preds = [],[]
         with torch.no_grad():
             for i,batch in enumerate(progress_bar(test_dl)):
                 self.model.eval()
+                dec = self.dls.decode_batch(batch).zip()
                 preds.append(self.model(batch[0]))
-                inputs.append(batch[0])                
-                #preds.append(self.model(*batch))
-                #inputs.append(*batch)
+                inputs.append(dec[0])                
                 self.model.train()
                 if max_n is not None:
-                    if len(inputs)>=max_n:
+                    if len(inputs)*test_dl.bs>=max_n:
                         break
         # preds: num_batches x bs x dict["boxes", "labels", "scores"]
         # flatten:
@@ -79,9 +77,8 @@ class fasterrcnn_learner(Learner):
         labels = [p[:,4] for p in preds]
         scores = [p[:,5] for p in preds]
         
-        return inputs, boxes, labels, scores
-    
-    
+        return inputs, boxes, labels, scores        
+        
     def show_results(self, items=None, max_n=9, item_tfms=None, batch_tfms=None, box_score_thresh=0.6):
         inputs, bboxes, labels, scores  = self.get_preds(items=items, box_score_thresh=box_score_thresh, max_n=max_n)
         #idx = 10
@@ -90,7 +87,9 @@ class fasterrcnn_learner(Learner):
             fig, ax = plt.subplots(figsize=(8,8))
             TensorImage(inputs[idx]).show(ax=ax)
             LabeledBBox(TensorBBox(bboxes[idx]), [self.dls.vocab[int(l.item())] 
-                                                  for l in labels[idx]]).show(ax)
+                                                    for l in labels[idx]]).show(ax)
+    
+    
         
 
 class maskrcnn_learner(Learner):
