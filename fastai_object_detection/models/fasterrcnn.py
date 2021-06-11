@@ -17,11 +17,12 @@ model_urls = {
         'https://download.pytorch.org/models/fasterrcnn_mobilenet_v3_large_fpn-fb6a3cc7.pth'
 }
 
-def get_FasterRCNN(arch_str, num_classes, pretrained=True, pretrained_backbone=True, **kwargs):
+def get_FasterRCNN(arch_str, num_classes, pretrained=True, pretrained_backbone=True, 
+                   trainable_layers=5, **kwargs):
     
     #if pretrained == True: pretrained_backbone=False
         
-    backbone = resnet_fpn_backbone(arch_str, pretrained=pretrained_backbone, trainable_layers=5)
+    backbone = resnet_fpn_backbone(arch_str, pretrained=pretrained_backbone, trainable_layers=trainable_layers)
     
     anchor_sizes = ((16,), (32,), (64,), (128,), (256,),)
     aspect_ratios = ((0.5, 1.0, 2.0),) * len(anchor_sizes)
