@@ -7,7 +7,7 @@ from fastai.torch_basics import *
 from fastai.torch_core import *
 #from functools import partial
 
-__all__ = ['mAP_at_IoU40', 'mAP_at_IoU50', 'mAP_at_IoU60', 'mAP_at_IoU70', 'mAP_at_IoU80', 'mAP_at_IoU90']        
+__all__ = ['mAP_at_IoU40', 'mAP_at_IoU50', 'mAP_at_IoU60', 'mAP_at_IoU70', 'mAP_at_IoU80', 'mAP_at_IoU90', 'mAP_at_IoU50_95']        
 
 class mAP_Metric():
     "Metric to calculate mAP for different IoU thresholds"
@@ -70,4 +70,5 @@ mAP_at_IoU60 = AvgMetric_ObjectDetection(mAP_Metric(0.6, "mAP@IoU>0.6", remove_b
 mAP_at_IoU70 = AvgMetric_ObjectDetection(mAP_Metric(0.7, "mAP@IoU>0.7", remove_background_class=True))
 mAP_at_IoU80 = AvgMetric_ObjectDetection(mAP_Metric(0.8, "mAP@IoU>0.8", remove_background_class=True))
 mAP_at_IoU90 = AvgMetric_ObjectDetection(mAP_Metric(0.9, "mAP@IoU>0.9", remove_background_class=True))
+mAP_at_IoU50_95 = AvgMetric_ObjectDetection(mAP_Metric(np.arange(0.5, 1.0, 0.05), "mAP@IoU 0.5:0.95", remove_background_class=True)) 
 
