@@ -81,7 +81,8 @@ class fasterrcnn_learner(Learner):
         return inputs, boxes, labels, scores        
         
     def show_results(self, items=None, max_n=9, item_tfms=None, batch_tfms=None, box_score_thresh=0.6):
-        inputs, bboxes, labels, scores  = self.get_preds(items=items, box_score_thresh=box_score_thresh, max_n=max_n)
+        inputs, bboxes, labels, scores  = self.get_preds(items=items, item_tfms=item_tfms, batch_tfms=batch_tfms, 
+                                                         box_score_thresh=box_score_thresh, max_n=max_n)
         #idx = 10
         for idx in range(len(inputs)):
             if idx >= max_n: break
