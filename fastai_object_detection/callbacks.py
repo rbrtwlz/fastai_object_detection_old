@@ -2,6 +2,10 @@ from fastai.callback.all import *
 from fastai.torch_basics import *
 from fastai.torch_core import *
 
+# temp bug fix
+# https://github.com/fastai/fastai/issues/3384
+TensorMultiCategory.register_func(Tensor.__getitem__, TensorMultiCategory, TensorBBox)
+
 __all__ = ['RCNNAdapter']
 
 
