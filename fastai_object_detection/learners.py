@@ -42,7 +42,7 @@ class fasterrcnn_learner(Learner):
         
     def get_preds(self, items=None, item_tfms=None, batch_tfms=None, box_score_thresh=0.05, max_n=None):        
         if items is not None:
-            if item_tfms is None: item_tfms = [Resize(800, method="pad", pad_mode="zeros")]
+            #if item_tfms is None: item_tfms = [Resize(800, method="pad", pad_mode="zeros")]
             dblock = DataBlock(
                 blocks=(ImageBlock(cls=PILImage)),
                 item_tfms=item_tfms,
