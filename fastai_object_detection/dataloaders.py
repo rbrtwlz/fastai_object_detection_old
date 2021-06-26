@@ -41,7 +41,7 @@ def BinaryMasksBlock():
     "A `TransformBlock` for binary masks"
     return TransformBlock(type_tfms=lambda x: tuple(apply(PILMask.create,x)), batch_tfms=IntToFloatTensor)
 
-def _bin_mask_stack_and_padding(t, pad_idx=0):
+def _bin_mask_stack_and_padding(t, pad_idx=-1):
     "Function for padding to create batches when number of objects is different"
     stacked_masks = [torch.stack(t[i][1], dim=0) for i in range(len(t))]
     imgs = [t[i][0] for i in range(len(t))]
@@ -107,7 +107,7 @@ class ObjectDetectionDataLoaders(DataLoaders):
                 item_tfms=item_tfms,
                 batch_tfms=batch_tfms)
             if debug: print(dblock.summary(df))
-            res = cls.from_dblock(dblock, df, path=".", **kwargs)
+            res = cls.from_dblock(dblock, df, path=".", before_batch=[partial(bb_pad, pad_idx=-1)], **kwargs)
             
         else:            
             dblock = DataBlock(
