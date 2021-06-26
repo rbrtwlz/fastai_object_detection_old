@@ -13,7 +13,7 @@ class RCNNAdapter(Callback):
     '''Callback to convert batches from fastai's dataloader 
     to the expected input of fasterrcnn/maskrcnn'''
     
-    def __init__(self, na_idx=0): self.na_idx = na_idx
+    def __init__(self, pad_idx=-1): self.pad_idx = pad_idx
         
     def after_create(self):
         self.learn.save_xb = []
@@ -79,7 +79,7 @@ class RCNNAdapter(Callback):
         #new_y = []
         for d in y:
             # remove padding
-            filt = d["labels"]!=self.na_idx
+            filt = d["labels"]!=self.pad_idx
             for k in keys:
                 d[k] = d[k][filt]
                 
