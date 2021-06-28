@@ -703,7 +703,7 @@ def trunc_normal_(tensor, mean=0., std=1., a=-2., b=2.):
 # --------------------------------------------------------
 # https://github.com/rwightman/pytorch-image-models/blob/master/timm/models/layers/drop.py
 
-  def drop_path(x, drop_prob: float = 0., training: bool = False):
+def drop_path(x, drop_prob: float = 0., training: bool = False):
     """Drop paths (Stochastic Depth) per sample (when applied in main path of residual blocks).
     This is the same as the DropConnect impl I created for EfficientNet, etc networks, however,
     the original name is misleading as 'Drop Connect' is a different form of dropout in a separate paper...
