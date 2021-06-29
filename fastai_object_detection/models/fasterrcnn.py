@@ -4,7 +4,7 @@ from torchvision.models.detection.anchor_utils import AnchorGenerator
 from torchvision.models.detection import FasterRCNN
 from torchvision.ops.misc import FrozenBatchNorm2d
 from functools import partial
-from fastai_object_detection.models.swin_transformer2 import SwinTransformer
+from fastai_object_detection.models.swin_transformer_backbone import SwinTransformer
 from fastai.vision.all import default_device
 
 
