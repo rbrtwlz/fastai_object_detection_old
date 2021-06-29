@@ -436,7 +436,7 @@ class PatchEmbed(nn.Module):
         return x
 
 
-@BACKBONES.register_module()
+#@BACKBONES.register_module()
 class SwinTransformer(nn.Module):
     """ Swin Transformer backbone.
         A PyTorch impl of : `Swin Transformer: Hierarchical Vision Transformer using Shifted Windows`  -
@@ -579,8 +579,8 @@ class SwinTransformer(nn.Module):
 
         if isinstance(pretrained, str):
             self.apply(_init_weights)
-            logger = get_root_logger()
-            load_checkpoint(self, pretrained, strict=False, logger=logger)
+            #logger = get_root_logger()
+            #load_checkpoint(self, pretrained, strict=False, logger=logger)
         elif pretrained is None:
             self.apply(_init_weights)
         else:
