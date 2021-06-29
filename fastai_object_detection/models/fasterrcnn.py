@@ -4,6 +4,9 @@ from torchvision.models.detection.anchor_utils import AnchorGenerator
 from torchvision.models.detection import FasterRCNN
 from torchvision.ops.misc import FrozenBatchNorm2d
 from functools import partial
+from fastai_object_detection.models.swin_transformer2 import SwinTransformer
+from fastai.vision.all import default_device
+
 
 __all__ = ['get_FasterRCNN', 'fasterrcnn_resnet18', 'fasterrcnn_resnet34', 'fasterrcnn_resnet50', 'fasterrcnn_resnet101', 'fasterrcnn_resnet152',
           'get_SWIN_FasterRCNN', 'fasterrcnn_swinT', 'fasterrcnn_swinS', 'fasterrcnn_swinB', 'fasterrcnn_swinL']
