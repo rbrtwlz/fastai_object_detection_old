@@ -5,7 +5,8 @@ from torchvision.models.detection import FasterRCNN
 from torchvision.ops.misc import FrozenBatchNorm2d
 from functools import partial
 
-__all__ = ['get_FasterRCNN', 'fasterrcnn_resnet18', 'fasterrcnn_resnet34', 'fasterrcnn_resnet50', 'fasterrcnn_resnet101', 'fasterrcnn_resnet152']
+__all__ = ['get_FasterRCNN', 'fasterrcnn_resnet18', 'fasterrcnn_resnet34', 'fasterrcnn_resnet50', 'fasterrcnn_resnet101', 'fasterrcnn_resnet152',
+          'get_SWIN_FasterRCNN', 'fasterrcnn_swinT', 'fasterrcnn_swinS', 'fasterrcnn_swinB', 'fasterrcnn_swinL']
 
 
 model_urls = {
@@ -73,13 +74,27 @@ def get_FasterRCNN(arch_str, num_classes, pretrained=True, pretrained_backbone=T
             
     return model.train()
 
-def get_SWIN_FasterRCNN(arch_str, num_classes, pretrained=False, pretrained_backbone=True, **kwargs):
+class SwinTransformerFPN(nn.Module):
+    def __init__(self, img_size=224, window_size=7, embed_dim=96, depths=[2, 2, 6, 2], fpn_cin=[96, 192, 384, 768], fpn_cout=256):
+        super().__init__()
+        self.body = SwinTransformer(pretrain_img_size=img_size, patch_size=4, in_chans=3, 
+                                    embed_dim=embed_dim, depths=depths, num_heads=[3, 6, 12, 24],
+                                    window_size=window_size, mlp_ratio=4.0, qkv_bias=True, qk_scale=None, drop_rate=0.0, 
+                                    attn_drop_rate=0.0, drop_path_rate=0.2, norm_layer=torch.nn.modules.normalization.LayerNorm,
+                                    ape=False,patch_norm=True, out_indices=(0, 1, 2, 3), frozen_stages=-1, use_checkpoint=False)
+        
+        self.fpn = FeaturePyramidNetwork(in_channels_list=fpn_cin,  out_channels=fpn_cout)
+        self.out_channels = fpn_cout
     
+    def forward(self, x):
+        x = self.body(x)
+        features = {f"{i}":v for i,v in enumerate(x)}
+        return self.fpn(features)
+    
+def get_SWIN_FasterRCNN(arch_str, num_classes, pretrained=False, pretrained_backbone=True, **kwargs):
     anchor_sizes = ((32,), (64,), (128,), (256,),)
     aspect_ratios = ((0.5, 1.0, 2.0),) * len(anchor_sizes)
-
     anchor_generator = AnchorGenerator(sizes=anchor_sizes, aspect_ratios=aspect_ratios)
-
     #roi_pooler = torchvision.ops.MultiScaleRoIAlign(featmap_names=['0','1','2','3'],
     #                                                output_size=7,
     #                                                sampling_ratio=2)
