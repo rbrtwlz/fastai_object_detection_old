@@ -1,3 +1,4 @@
+import torch
 import torch.nn as nn
 from torchvision.models.detection.backbone_utils import resnet_fpn_backbone
 from torchvision.models.utils import load_state_dict_from_url
