@@ -61,7 +61,7 @@ class AvgMetric_ObjectDetection(Metric):
     def reset(self): self.total,self.count = 0.,0
     def accumulate(self, learn):
         bs = len(learn.xb[0])
-        self.total += learn.to_detach(self.func(learn.pred, *learn.yb, num_classes=len(learn.dls.vocab)))*bs
+        self.total += learn.to_detach(self.func(learn.pred, *learn.yb, num_classes=learn.num_classes))*bs
         self.count += bs
     @property
     def value(self): return self.total/self.count if self.count != 0 else None
