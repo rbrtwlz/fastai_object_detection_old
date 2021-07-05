@@ -7,8 +7,8 @@ from torchvision.ops.feature_pyramid_network import FeaturePyramidNetwork
 from torchvision.models.detection import FasterRCNN
 from torchvision.ops.misc import FrozenBatchNorm2d
 from functools import partial
-from fastai_object_detection.models.swin_transformer_backbone import SwinTransformer
 from fastai.vision.all import default_device
+from .swin_transformer_source import SwinTransformer
 
 
 __all__ = ['get_FasterRCNN', 'fasterrcnn_resnet18', 'fasterrcnn_resnet34', 'fasterrcnn_resnet50', 'fasterrcnn_resnet101', 'fasterrcnn_resnet152',
