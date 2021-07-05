@@ -1,7 +1,7 @@
 import torch
 from torchvision.ops.boxes import batched_nms
 from torchvision.models.utils import load_state_dict_from_url
-from effectivenet_source import FocalLoss, BBoxTransform, ClipBoxes, EfficientDetBackbone
+from .efficientdet_source import FocalLoss, BBoxTransform, ClipBoxes, EfficientDetBackbone
 
 __all__ = ['get_efficientdet_model', 'efficientdet_d0', 'efficientdet_d1', 'efficientdet_d2', 'efficientdet_d3', 
            'efficientdet_d4', 'efficientdet_d5', 'efficientdet_d6', 'efficientdet_d7']
