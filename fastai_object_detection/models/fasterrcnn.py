@@ -12,7 +12,7 @@ from fastai.vision.all import default_device
 
 
 __all__ = ['get_FasterRCNN', 'fasterrcnn_resnet18', 'fasterrcnn_resnet34', 'fasterrcnn_resnet50', 'fasterrcnn_resnet101', 'fasterrcnn_resnet152',
-          'get_SWIN_FasterRCNN', 'fasterrcnn_swinT', 'fasterrcnn_swinS', 'fasterrcnn_swinB', 'fasterrcnn_swinL']
+          'get_FasterRCNN_SWIN', 'fasterrcnn_swinT', 'fasterrcnn_swinS', 'fasterrcnn_swinB', 'fasterrcnn_swinL']
 
 
 model_urls = {
@@ -21,10 +21,7 @@ model_urls = {
     'fasterrcnn_mobilenet_v3_large_320_fpn_coco':
         'https://download.pytorch.org/models/fasterrcnn_mobilenet_v3_large_320_fpn-907ea3f9.pth',
     'fasterrcnn_mobilenet_v3_large_fpn_coco':
-        'https://download.pytorch.org/models/fasterrcnn_mobilenet_v3_large_fpn-fb6a3cc7.pth'
-}
-
-model_urls_swin = {
+        'https://download.pytorch.org/models/fasterrcnn_mobilenet_v3_large_fpn-fb6a3cc7.pth',
     'swin_tiny_224': 'https://github.com/SwinTransformer/storage/releases/download/v1.0.0/swin_tiny_patch4_window7_224.pth',
     'swin_small_224': 'https://github.com/SwinTransformer/storage/releases/download/v1.0.0/swin_small_patch4_window7_224.pth',
     'swin_base_224': 'https://github.com/SwinTransformer/storage/releases/download/v1.0.0/swin_base_patch4_window7_224.pth',
@@ -80,24 +77,8 @@ def get_FasterRCNN(arch_str, num_classes, pretrained=True, pretrained_backbone=T
             
     return model.train()
 
-class SwinTransformerFPN(nn.Module):
-    def __init__(self, img_size=224, window_size=7, embed_dim=96, depths=[2, 2, 6, 2], fpn_cin=[96, 192, 384, 768], fpn_cout=256):
-        super().__init__()
-        self.body = SwinTransformer(pretrain_img_size=img_size, patch_size=4, in_chans=3, 
-                                    embed_dim=embed_dim, depths=depths, num_heads=[3, 6, 12, 24],
-                                    window_size=window_size, mlp_ratio=4.0, qkv_bias=True, qk_scale=None, drop_rate=0.0, 
-                                    attn_drop_rate=0.0, drop_path_rate=0.2, norm_layer=torch.nn.modules.normalization.LayerNorm,
-                                    ape=False,patch_norm=True, out_indices=(0, 1, 2, 3), frozen_stages=-1, use_checkpoint=False)
-        
-        self.fpn = FeaturePyramidNetwork(in_channels_list=fpn_cin,  out_channels=fpn_cout)
-        self.out_channels = fpn_cout
-    
-    def forward(self, x):
-        x = self.body(x)
-        features = {f"{i}":v for i,v in enumerate(x)}
-        return self.fpn(features)
-    
-def get_SWIN_FasterRCNN(arch_str, num_classes, pretrained=False, pretrained_backbone=True, **kwargs):
+
+def get_FasterRCNN_SWIN(arch_str, num_classes, pretrained=False, pretrained_backbone=True, **kwargs):
     anchor_sizes = ((32,), (64,), (128,), (256,),)
     aspect_ratios = ((0.5, 1.0, 2.0),) * len(anchor_sizes)
     anchor_generator = AnchorGenerator(sizes=anchor_sizes, aspect_ratios=aspect_ratios)
@@ -119,7 +100,7 @@ def get_SWIN_FasterRCNN(arch_str, num_classes, pretrained=False, pretrained_back
                                   depths=depths, fpn_cin=fpn_cin, fpn_cout=256)
     
     if pretrained_backbone:
-        sd = load_state_dict_from_url(model_urls_swin[f'{arch_str}_{img_size}'], 
+        sd = load_state_dict_from_url(model_urls[f'{arch_str}_{img_size}'], 
                                       progress=True, map_location=default_device())['model']
         sd_model = backbone.state_dict()
         sd = {k: v for k, v in sd.items() if k in sd_model.keys()}
@@ -142,13 +123,31 @@ def get_SWIN_FasterRCNN(arch_str, num_classes, pretrained=False, pretrained_back
     return model.train()
 
 
+class SwinTransformerFPN(nn.Module):
+    def __init__(self, img_size=224, window_size=7, embed_dim=96, depths=[2, 2, 6, 2], fpn_cin=[96, 192, 384, 768], fpn_cout=256):
+        super().__init__()
+        self.body = SwinTransformer(pretrain_img_size=img_size, patch_size=4, in_chans=3, 
+                                    embed_dim=embed_dim, depths=depths, num_heads=[3, 6, 12, 24],
+                                    window_size=window_size, mlp_ratio=4.0, qkv_bias=True, qk_scale=None, drop_rate=0.0, 
+                                    attn_drop_rate=0.0, drop_path_rate=0.2, norm_layer=torch.nn.modules.normalization.LayerNorm,
+                                    ape=False,patch_norm=True, out_indices=(0, 1, 2, 3), frozen_stages=-1, use_checkpoint=False)
+        
+        self.fpn = FeaturePyramidNetwork(in_channels_list=fpn_cin,  out_channels=fpn_cout)
+        self.out_channels = fpn_cout
+    
+    def forward(self, x):
+        x = self.body(x)
+        features = {f"{i}":v for i,v in enumerate(x)}
+        return self.fpn(features)
+
+
 fasterrcnn_resnet18 = partial(get_FasterRCNN, arch_str="resnet18")
 fasterrcnn_resnet34 = partial(get_FasterRCNN, arch_str="resnet34")
 fasterrcnn_resnet50 = partial(get_FasterRCNN, arch_str="resnet50")
 fasterrcnn_resnet101 = partial(get_FasterRCNN, arch_str="resnet101")
 fasterrcnn_resnet152 = partial(get_FasterRCNN, arch_str="resnet152")
-fasterrcnn_swinT = partial(get_SWIN_FasterRCNN, arch_str="swin_tiny")
-fasterrcnn_swinS = partial(get_SWIN_FasterRCNN, arch_str="swin_small")
-fasterrcnn_swinB = partial(get_SWIN_FasterRCNN, arch_str="swin_base")
-fasterrcnn_swinL = partial(get_SWIN_FasterRCNN, arch_str="swin_large")
+fasterrcnn_swinT = partial(get_FasterRCNN_SWIN, arch_str="swin_tiny")
+fasterrcnn_swinS = partial(get_FasterRCNN_SWIN, arch_str="swin_small")
+fasterrcnn_swinB = partial(get_FasterRCNN_SWIN, arch_str="swin_base")
+fasterrcnn_swinL = partial(get_FasterRCNN_SWIN, arch_str="swin_large")
 
