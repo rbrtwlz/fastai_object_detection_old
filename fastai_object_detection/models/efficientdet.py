@@ -1,4 +1,5 @@
 import torch
+import torch.nn as nn
 from torchvision.ops.boxes import batched_nms
 from torchvision.models.utils import load_state_dict_from_url
 from .efficientdet_source import FocalLoss, BBoxTransform, ClipBoxes, EfficientDetBackbone
