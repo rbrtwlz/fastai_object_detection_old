@@ -23,7 +23,6 @@ class fasterrcnn_learner(Learner):
                  **kwargs):
                 
         if num_classes is None: num_classes = len(dls.vocab)
-        self.num_classes = num_classes
         
         if cbs is None: cbs = [RCNNAdapter()]
         else: cbs = L(RCNNAdapter())+L(cbs)
@@ -105,7 +104,6 @@ class maskrcnn_learner(Learner):
                  **kwargs):    
         
         if num_classes is None: num_classes = len(dls.vocab)
-        self.num_classes = num_classes
         
         if cbs is None: cbs = [RCNNAdapter()]
         else: cbs = L(RCNNAdapter())+L(cbs)
