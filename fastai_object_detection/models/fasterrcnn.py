@@ -12,7 +12,7 @@ from fastai.vision.all import default_device
 
 
 __all__ = ['get_FasterRCNN', 'fasterrcnn_resnet18', 'fasterrcnn_resnet34', 'fasterrcnn_resnet50', 'fasterrcnn_resnet101', 'fasterrcnn_resnet152',
-          'get_FasterRCNN_SWIN', 'fasterrcnn_swinT', 'fasterrcnn_swinS', 'fasterrcnn_swinB', 'fasterrcnn_swinL']
+           'get_FasterRCNN_SWIN', 'fasterrcnn_swinT', 'fasterrcnn_swinS', 'fasterrcnn_swinB', 'fasterrcnn_swinL']
 
 
 model_urls = {
