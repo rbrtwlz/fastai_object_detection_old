@@ -16,7 +16,7 @@ def rcnn_split(m):
     body_params, head_params = L(params(m.backbone)), L()
     for p in [m.rpn, m.roi_heads]:
         head_params += params(p)
-    return [body_params, head_params]
+    return L(body_params, head_params)
 
 def effdet_split(m):
     "Default split of params for efficientdet models"
