@@ -89,6 +89,9 @@ class fasterrcnn_learner(Learner):
         # only preds with score > box_score_thresh
         preds = [p[p[:,5]>box_score_thresh] for p in preds]
         
+        # denormalize inputs
+        inputs = [self.dls.valid.decode([i])[0][0] for i in inputs]
+        
         boxes = [p[:,:4] for p in preds]
         labels = [p[:,4] for p in preds]
         scores = [p[:,5] for p in preds]
@@ -160,7 +163,10 @@ class maskrcnn_learner(Learner):
         labels = [p["labels"][filt[i]].cpu() for i,p in enumerate(preds)]
         scores = [p["scores"][filt[i]].cpu() for i,p in enumerate(preds)]
         
-        print(len(masks))
+        # denormalize inputs
+        inputs = [self.dls.valid.decode([i])[0][0] for i in inputs]
+        
+        #print(len(masks))
         # by default returns masks in [N, 1, H, W] with activations
         # if you want binary masks in [N, H, W] set bin_mask_thresh 
         if bin_mask_thresh is not None:
@@ -252,7 +258,7 @@ class efficientdet_learner(Learner):
         return inputs, boxes, labels, scores 
 
 
-    def show_results(self, items=None, item_tfms=None, batch_tfms=None, box_score_thresh=0.05, max_n=None):
+    def show_results(self, items=None, item_tfms=None, batch_tfms=None, box_score_thresh=0.50, max_n=None):
         inputs, boxes, labels, scores = self.get_preds(items=items, item_tfms=item_tfms, batch_tfms=batch_tfms, 
                                                        box_score_thresh=box_score_thresh, max_n=max_n)
         for idx in range(len(inputs)):
