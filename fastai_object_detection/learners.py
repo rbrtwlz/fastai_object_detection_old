@@ -103,7 +103,8 @@ class fasterrcnn_learner(Learner):
                                                          box_score_thresh=box_score_thresh, max_n=max_n)
         #idx = 10
         for idx in range(len(inputs)):
-            if idx >= max_n: break
+            if max_n is not None:
+                if idx >= max_n: break
             fig, ax = plt.subplots(figsize=(8,8))
             TensorImage(inputs[idx]).show(ax=ax)
             LabeledBBox(TensorBBox(bboxes[idx]), [self.dls.vocab[int(l.item())] 
@@ -186,7 +187,8 @@ class maskrcnn_learner(Learner):
         
         #idx = 10
         for idx in range(len(inputs)):
-            if idx >= max_n: break
+            if max_n is not None:
+                if idx >= max_n: break
             fig, ax = plt.subplots(figsize=(8,8))
             TensorImage(inputs[idx]).show(ax=ax),
             TensorMask(masks[idx]).show(ax),
