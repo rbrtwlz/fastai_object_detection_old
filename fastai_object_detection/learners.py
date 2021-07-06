@@ -12,7 +12,7 @@ def no_split(m):
     return L(m).map(params)
 
 def rcnn_split(m):
-    "Default split of params for fasterrcnn models"
+    "Default split of params for fasterrcnn/maskrcnn models"
     body_params, head_params = L(params(m.backbone)), L()
     for p in [m.rpn, m.roi_heads]:
         head_params += params(p)
