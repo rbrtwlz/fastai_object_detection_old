@@ -7,11 +7,16 @@ from .callbacks import *
 __all__ = ['fasterrcnn_learner', 'maskrcnn_learner', 'efficientdet_learner']
 
 
-def rcnn_split(m):
-    "Default split of params for rcnn models"
-    #m = L(c.parameters() for c in m.children())
-    #return L(m[:2], m[2:])
+def no_split(m):
+    "No split of params for models"
     return L(m).map(params)
+
+def rcnn_split(m):
+    "Default split of params for fasterrcnn models"
+    body_params, head_params = L(params(m.backbone)), L()
+    for p in [m.rpn, m.roi_heads]:
+        head_params += params(p)
+    return [body_params, head_params]
 
 def effdet_split(m):
     "Default split of params for efficientdet models"
