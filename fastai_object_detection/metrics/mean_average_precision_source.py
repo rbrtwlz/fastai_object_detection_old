@@ -4,6 +4,10 @@ import torch
 
 ### port of https://github.com/bes-dev/mean_average_precision from numpy to pytorch
 
+metrics_dict = {
+    'map_2d': MeanAveragePrecision2d
+} 
+
 class MetricBase:
     """ Implements base interface for evaluation metrics."""
     def add(self, *args, **kwargs):
@@ -113,10 +117,6 @@ class MetricBuilder:
             metric_fn = MetricMultiprocessing(metrics_dict[metric_type], *args, **kwargs)
         return adapter_type(metric_fn)
       
-        
-metrics_dict = {
-    'map_2d': MeanAveragePrecision2d
-} 
       
 class MeanAveragePrecision2d(MetricBase):
     """ Mean Average Precision for object detection.
