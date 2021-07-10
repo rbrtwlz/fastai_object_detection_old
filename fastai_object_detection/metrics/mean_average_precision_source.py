@@ -113,6 +113,10 @@ class MetricBuilder:
             metric_fn = MetricMultiprocessing(metrics_dict[metric_type], *args, **kwargs)
         return adapter_type(metric_fn)
       
+        
+metrics_dict = {
+    'map_2d': MeanAveragePrecision2d
+} 
       
 class MeanAveragePrecision2d(MetricBase):
     """ Mean Average Precision for object detection.
