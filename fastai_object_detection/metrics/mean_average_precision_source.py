@@ -4,10 +4,6 @@ import torch
 
 ### port of https://github.com/bes-dev/mean_average_precision from numpy to pytorch
 
-metrics_dict = {
-    'map_2d': MeanAveragePrecision2d
-} 
-
 class MetricBase:
     """ Implements base interface for evaluation metrics."""
     def add(self, *args, **kwargs):
@@ -422,3 +418,10 @@ def check_box(iou, difficult, crowd, order, matched_ind, iou_threshold, mpolicy=
     else:
         result = ('fp', -1)
     return result
+
+
+metrics_dict = {
+    'map_2d': MeanAveragePrecision2d
+} 
+
+
