@@ -107,10 +107,13 @@ class MetricBuilder:
             metric_fn (MetricBase): instance of the evaluation metric.
         """
         assert metric_type in metrics_dict, "Unknown metric_type"
-        if not async_mode:
-            metric_fn = metrics_dict[metric_type](*args, **kwargs)
-        else:
-            metric_fn = MetricMultiprocessing(metrics_dict[metric_type], *args, **kwargs)
+        
+        metric_fn = metrics_dict[metric_type](*args, **kwargs)
+        
+        #if not async_mode:
+        #    metric_fn = metrics_dict[metric_type](*args, **kwargs)
+        #else:
+        #    metric_fn = MetricMultiprocessing(metrics_dict[metric_type], *args, **kwargs)
         return adapter_type(metric_fn)
       
       
