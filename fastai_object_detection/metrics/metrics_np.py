@@ -7,8 +7,8 @@ from fastai.torch_basics import *
 from fastai.torch_core import *
 #from functools import partial
 
-__all__ = ['mAP_at_IoU40', 'mAP_at_IoU50', 'mAP_at_IoU60', 'mAP_at_IoU70', 'mAP_at_IoU80', 
-           'mAP_at_IoU90', 'mAP_at_IoU50_95', 'create_mAP_metric']        
+__all__ = ['mAP_at_IoU40_np', 'mAP_at_IoU50_np', 'mAP_at_IoU60_np', 'mAP_at_IoU70_np', 'mAP_at_IoU80_np', 
+           'mAP_at_IoU90_np', 'mAP_at_IoU50_95_np', 'create_mAP_metric_np']        
 
 class mAP_Metric():
     "Metric to calculate mAP for different IoU thresholds"
@@ -68,15 +68,15 @@ class AvgMetric_ObjectDetection(Metric):
     @property
     def name(self): return self.func.func.__name__ if hasattr(self.func, 'func') else  self.func.__name__
     
-def create_mAP_metric(iou_tresh=np.arange(0.5, 1.0, 0.05), metric_name="mAP@IoU 0.5:0.95", remove_background_class=False):
+def create_mAP_metric_np(iou_tresh=np.arange(0.5, 1.0, 0.05), metric_name="mAP@IoU 0.5:0.95", remove_background_class=False):
     return AvgMetric_ObjectDetection(mAP_Metric(iou_tresh, metric_name, remove_background_class=remove_background_class)) 
     
     
-mAP_at_IoU40 = AvgMetric_ObjectDetection(mAP_Metric(0.4, "mAP@IoU>0.4", remove_background_class=True))
-mAP_at_IoU50 = AvgMetric_ObjectDetection(mAP_Metric(0.5, "mAP@IoU>0.5", remove_background_class=True))
-mAP_at_IoU60 = AvgMetric_ObjectDetection(mAP_Metric(0.6, "mAP@IoU>0.6", remove_background_class=True))
-mAP_at_IoU70 = AvgMetric_ObjectDetection(mAP_Metric(0.7, "mAP@IoU>0.7", remove_background_class=True))
-mAP_at_IoU80 = AvgMetric_ObjectDetection(mAP_Metric(0.8, "mAP@IoU>0.8", remove_background_class=True))
-mAP_at_IoU90 = AvgMetric_ObjectDetection(mAP_Metric(0.9, "mAP@IoU>0.9", remove_background_class=True))
-mAP_at_IoU50_95 = AvgMetric_ObjectDetection(mAP_Metric(np.arange(0.5, 1.0, 0.05), "mAP@IoU 0.5:0.95", remove_background_class=True)) 
+mAP_at_IoU40_np = AvgMetric_ObjectDetection(mAP_Metric(0.4, "mAP@IoU>0.4", remove_background_class=True))
+mAP_at_IoU50_np = AvgMetric_ObjectDetection(mAP_Metric(0.5, "mAP@IoU>0.5", remove_background_class=True))
+mAP_at_IoU60_np = AvgMetric_ObjectDetection(mAP_Metric(0.6, "mAP@IoU>0.6", remove_background_class=True))
+mAP_at_IoU70_np = AvgMetric_ObjectDetection(mAP_Metric(0.7, "mAP@IoU>0.7", remove_background_class=True))
+mAP_at_IoU80_np = AvgMetric_ObjectDetection(mAP_Metric(0.8, "mAP@IoU>0.8", remove_background_class=True))
+mAP_at_IoU90_np = AvgMetric_ObjectDetection(mAP_Metric(0.9, "mAP@IoU>0.9", remove_background_class=True))
+mAP_at_IoU50_95_np = AvgMetric_ObjectDetection(mAP_Metric(np.arange(0.5, 1.0, 0.05), "mAP@IoU 0.5:0.95", remove_background_class=True)) 
 
