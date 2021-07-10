@@ -17,7 +17,8 @@ class mAP_Metric():
     def __call__(self, preds, targs, num_classes):
         if self.remove_background_class:
             num_classes=num_classes-1
-        metric_fn = MetricBuilder.build_evaluation_metric("map_2d", async_mode=True, num_classes=num_classes)
+        #metric_fn = MetricBuilder.build_evaluation_metric("map_2d", async_mode=True, num_classes=num_classes)
+        metric_fn = MetricBuilder.build_evaluation_metric("map_2d", async_mode=False, num_classes=num_classes)
         for sample_preds, sample_targs in self.create_metric_samples(preds, targs):
             metric_fn.add(sample_preds, sample_targs)
         metric_batch = metric_fn.value(iou_thresholds=self.iou_thresholds,
