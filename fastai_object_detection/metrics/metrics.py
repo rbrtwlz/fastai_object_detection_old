@@ -34,7 +34,7 @@ class mAP_Metric():
             if self.remove_background_class:
                 # first idx is background
                 try:
-                    pred_np= pred_np-torch.tensor([0,0,0,0,1,0], device=res.device)
+                    pred_np= pred_np-np.array([0,0,0,0,1,0])
                 except: pass
             pred_samples.append(pred_np)
 
@@ -47,7 +47,7 @@ class mAP_Metric():
             if self.remove_background_class:
                 # first idx is background 
                 try:
-                    targ_np= targ_np-torch.tensor([0,0,0,0,1,0,0], device=targ.device)
+                    targ_np= targ_np-np.array([0,0,0,0,1,0,0])
                 except: pass
             targ_samples.append(targ_np)
 
