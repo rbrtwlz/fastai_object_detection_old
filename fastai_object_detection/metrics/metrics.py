@@ -30,7 +30,7 @@ class mAP_Metric():
         pred_samples = []
         for pred in preds:
             res = torch.cat([pred["boxes"], pred["labels"].unsqueeze(-1), pred["scores"].unsqueeze(-1)], dim=1) 
-            pred_np = res.detach().cpu()#.numpy()
+            pred_np = res.detach()#.cpu()#.numpy()
             if self.remove_background_class:
                 # first idx is background
                 try:
@@ -42,7 +42,7 @@ class mAP_Metric():
         for targ in targs: # targs : yb[0]
             targ = torch.cat([targ["boxes"],targ["labels"].unsqueeze(-1)], dim=1)
             targ = torch.cat([targ, torch.zeros([targ.shape[0], 2], device=targ.device)], dim=1)
-            targ_np = targ.detach().cpu()
+            targ_np = targ.detach()#.cpu()
             #targ_np = np.array(targ.detach().cpu())
             if self.remove_background_class:
                 # first idx is background 
