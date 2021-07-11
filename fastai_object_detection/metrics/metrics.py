@@ -30,11 +30,11 @@ class mAP_Metric():
         pred_samples = []
         for pred in preds:
             res = torch.cat([pred["boxes"], pred["labels"].unsqueeze(-1), pred["scores"].unsqueeze(-1)], dim=1) 
-            pred_np = res.detach().cpu()#.numpy()
+            pred_np = res.detach()#.cpu()#.numpy()
             if self.remove_background_class:
                 # first idx is background
                 try:
-                    pred_np= pred_np-np.array([0,0,0,0,1,0])
+                    pred_np= pred_np-torch.tensor([0,0,0,0,1,0], device=res.device)
                 except: pass
             pred_samples.append(pred_np)
 
@@ -42,12 +42,12 @@ class mAP_Metric():
         for targ in targs: # targs : yb[0]
             targ = torch.cat([targ["boxes"],targ["labels"].unsqueeze(-1)], dim=1)
             targ = torch.cat([targ, torch.zeros([targ.shape[0], 2], device=targ.device)], dim=1)
-            targ_np = targ.detach().cpu()
+            targ_np = targ.detach()#.cpu()
             #targ_np = np.array(targ.detach().cpu())
             if self.remove_background_class:
                 # first idx is background 
                 try:
-                    targ_np= targ_np-np.array([0,0,0,0,1,0,0])
+                    targ_np= targ_np-torch.tensor([0,0,0,0,1,0,0], device=targ.device)
                 except: pass
             targ_samples.append(targ_np)
 
