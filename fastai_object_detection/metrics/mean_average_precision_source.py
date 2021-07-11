@@ -240,7 +240,11 @@ class MeanAveragePrecision2d(MetricBase):
         for i in range(self.num_classes):
             self.match_table.append(pd.DataFrame(columns=columns))
             
-            
+def _reverse(t:torch.Tensor):
+    idx = [i for i in range(t.size(0)-1, -1, -1)]
+    idx = torch.LongTensor(idx)
+    return t.index_select(0, idx)
+    
 def sort_by_col(array, idx=1):
     """Sort torch.tensor by column."""
     order = torch.argsort(array[:, idx])[::-1]
@@ -310,7 +314,7 @@ def compute_iou(pred, gt):
         return (box[:, 2] - box[:, 0] + 1.) * (box[:, 3] - box[:, 1] + 1.)
 
     #_gt = torch.tile(gt, (pred.shape[0], 1))
-    _gt = gt.repeat((pred.shape[0], 1))
+    _gt = gt.repeat(pred.shape[0], 1)
     _pred = torch.repeat_interleave(pred, gt.shape[0], dim=0)
 
     ixmin = torch.maximum(_gt[:, 0], _pred[:, 0])
@@ -346,10 +350,6 @@ def compute_match_table(preds, gt, img_id):
     def _empty_array_2d(size):
         return [[] for i in range(size)]
     
-    def _reverse(t:torch.Tensor):
-        idx = [i for i in range(t.size(0)-1, -1, -1)]
-        idx = torch.LongTensor(idx)
-        return t.index_select(0, idx)
     
     match_table = {}
     match_table["img_id"] = [img_id for i in range(preds.shape[0])]
