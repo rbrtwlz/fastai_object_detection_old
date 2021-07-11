@@ -85,9 +85,9 @@ class EffDetModelWrapper(nn.Module):
                 boxes_ = transformed_anchors_per[anchors_nms_idx, :]
 
                 out.append({
-                    'boxes': boxes_.cpu(),
-                    'labels': classes_.cpu(),
-                    'scores': scores_.cpu(),
+                    'boxes': boxes_#.cpu(),
+                    'labels': classes_#.cpu(),
+                    'scores': scores_#.cpu(),
                 })
             else:
                 out.append({
