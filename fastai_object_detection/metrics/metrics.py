@@ -9,9 +9,11 @@ __all__ = ['mAP_at_IoU40', 'mAP_at_IoU50', 'mAP_at_IoU60', 'mAP_at_IoU70', 'mAP_
 
 class mAP_Metric():
     "Metric to calculate mAP for different IoU thresholds"
-    def __init__(self, iou_thresholds, name, remove_background_class=True):
+    def __init__(self, iou_thresholds, recall_thresholds=None, mpolicy="greedy", name="mAP", remove_background_class=True):
         self.__name__ = name
         self.iou_thresholds = iou_thresholds
+        self.recall_thresholds = recall_thresholds
+        self.mpolicy = mpolicy
         self.remove_background_class = remove_background_class
         
     def __call__(self, preds, targs, num_classes):
@@ -22,8 +24,8 @@ class mAP_Metric():
         for sample_preds, sample_targs in self.create_metric_samples(preds, targs):
             metric_fn.add(sample_preds, sample_targs)
         metric_batch = metric_fn.value(iou_thresholds=self.iou_thresholds,
-                                       recall_thresholds=np.arange(0., 1.01, 0.01), 
-                                       mpolicy='soft')['mAP']
+                                       recall_thresholds=self.recall_thresholds, 
+                                       mpolicy=self.mpolicy)['mAP']
         return metric_batch
     
     def create_metric_samples(self, preds, targs):
@@ -67,14 +69,35 @@ class AvgMetric_ObjectDetection(Metric):
     @property
     def name(self): return self.func.func.__name__ if hasattr(self.func, 'func') else  self.func.__name__
     
-def create_mAP_metric(iou_tresh=np.arange(0.5, 1.0, 0.05), metric_name="mAP@IoU 0.5:0.95", remove_background_class=False):
-    return AvgMetric_ObjectDetection(mAP_Metric(iou_tresh, metric_name, remove_background_class=remove_background_class)) 
+           
+def create_mAP_metric(iou_tresh, recall_thresholds, mpolicy, metric_name, remove_background_class=True):
+    """ Creates a function to pass into learner for measuring mAP.
+    iou_tresh: float or np.arange, f.e.: np.arange(0.5, 1.0, 0.05)
+    recall_thresholds: None or np.arange, f.e.: np.arange(0., 1.01, 0.01)
+    mpolicy: str, 'soft' or 'greedy'
+    metric_name: str, name to display in fastai´s recorder
+    remove_background_class: True or False, remove first index before evaluation, as it represents background class in our dataloader
+    ----
+    Metric Examples:
+    COCO mAP: set recall_thresholds=np.arange(0., 1.01, 0.01), mpolicy="soft"
+    VOC PASCAL mAP: set recall_thresholds=np.arange(0., 1.1, 0.1), mpolicy="greedy"
+    VOC PASCAL mAP in all points: set recall_thresholds=None, mpolicy="greedy"
+    """
+    return AvgMetric_ObjectDetection(mAP_Metric(iou_tresh, recall_thresholds=recall_thresholds, mpolicy=mpolicy,
+                                                    name=metric_name, remove_background_class=True)) 
     
-    
-mAP_at_IoU40 = AvgMetric_ObjectDetection(mAP_Metric(0.4, "mAP@IoU>0.4", remove_background_class=True))
-mAP_at_IoU50 = AvgMetric_ObjectDetection(mAP_Metric(0.5, "mAP@IoU>0.5", remove_background_class=True))
-mAP_at_IoU60 = AvgMetric_ObjectDetection(mAP_Metric(0.6, "mAP@IoU>0.6", remove_background_class=True))
-mAP_at_IoU70 = AvgMetric_ObjectDetection(mAP_Metric(0.7, "mAP@IoU>0.7", remove_background_class=True))
-mAP_at_IoU80 = AvgMetric_ObjectDetection(mAP_Metric(0.8, "mAP@IoU>0.8", remove_background_class=True))
-mAP_at_IoU90 = AvgMetric_ObjectDetection(mAP_Metric(0.9, "mAP@IoU>0.9", remove_background_class=True))
-mAP_at_IoU50_95 = AvgMetric_ObjectDetection(mAP_Metric(np.arange(0.5, 1.0, 0.05), "mAP@IoU 0.5:0.95", remove_background_class=True)) 
+# coco mAP    
+mAP_at_IoU40 = AvgMetric_ObjectDetection(mAP_Metric(0.4, recall_thresholds=np.arange(0., 1.01, 0.01), mpolicy="soft",
+                                                    name="mAP@IoU>0.4", remove_background_class=True))
+mAP_at_IoU50 = AvgMetric_ObjectDetection(mAP_Metric(0.5, recall_thresholds=np.arange(0., 1.01, 0.01), mpolicy="soft",
+                                                    name="mAP@IoU>0.5", remove_background_class=True))
+mAP_at_IoU60 = AvgMetric_ObjectDetection(mAP_Metric(0.6, recall_thresholds=np.arange(0., 1.01, 0.01), mpolicy="soft",
+                                                    name="mAP@IoU>0.6", remove_background_class=True))
+mAP_at_IoU70 = AvgMetric_ObjectDetection(mAP_Metric(0.7, recall_thresholds=np.arange(0., 1.01, 0.01), mpolicy="soft",
+                                                    name="mAP@IoU>0.7", remove_background_class=True))
+mAP_at_IoU80 = AvgMetric_ObjectDetection(mAP_Metric(0.8, recall_thresholds=np.arange(0., 1.01, 0.01), mpolicy="soft",
+                                                    name="mAP@IoU>0.8", remove_background_class=True))
+mAP_at_IoU90 = AvgMetric_ObjectDetection(mAP_Metric(0.9, recall_thresholds=np.arange(0., 1.01, 0.01), mpolicy="soft",
+                                                    name="mAP@IoU>0.9", remove_background_class=True))
+mAP_at_IoU50_95 = AvgMetric_ObjectDetection(mAP_Metric(np.arange(0.5, 1.0, 0.05), recall_thresholds=np.arange(0., 1.01, 0.01), mpolicy="soft",
+                                                    name="mAP@IoU 0.5:0.95", remove_background_class=True)) 
