@@ -249,6 +249,10 @@ class efficientdet_learner(Learner):
         
         # only preds with score > box_score_thresh
         preds = [p[p[:,5]>box_score_thresh] for p in preds]
+        
+        # only preds with bbox area > 0
+        filt = [((p[:,3]-p[:,1])*(p[:,2]-p[:,0]))>0 for p in preds]
+        preds = [p[filt[i]] for i,p in enumerate(preds)]
 
         # denormalize inputs
         inputs = [self.dls.valid.decode([i])[0][0] for i in inputs]
