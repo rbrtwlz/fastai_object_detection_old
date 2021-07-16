@@ -218,7 +218,7 @@ class efficientdet_learner(Learner):
                    moms=moms)
         
 
-    def get_preds(self, items=None, item_tfms=None, batch_tfms=None, box_score_thresh=0.05, max_n=None):        
+    def get_preds(self, items=None, item_tfms=None, batch_tfms=None, box_score_thresh=0.05, max_n=None, progress=True):        
         if items is not None:
             #if item_tfms is None: item_tfms = [Resize(800, method="pad", pad_mode="zeros")]
             dblock = DataBlock(
@@ -231,7 +231,7 @@ class efficientdet_learner(Learner):
             
         inputs,preds = [],[]
         with torch.no_grad():
-            for i,batch in enumerate(progress_bar(test_dl)):
+            for i,batch in enumerate(progress_bar(test_dl, display=progress)):
                 self.model.eval()
                 preds.append(self.model(batch[0]))
                 inputs.append(batch[0])
@@ -264,9 +264,9 @@ class efficientdet_learner(Learner):
         return inputs, boxes, labels, scores 
 
 
-    def show_results(self, items=None, item_tfms=None, batch_tfms=None, box_score_thresh=0.50, max_n=None):
+    def show_results(self, items=None, item_tfms=None, batch_tfms=None, box_score_thresh=0.50, max_n=None, progress=False):
         inputs, boxes, labels, scores = self.get_preds(items=items, item_tfms=item_tfms, batch_tfms=batch_tfms, 
-                                                       box_score_thresh=box_score_thresh, max_n=max_n)
+                                                       box_score_thresh=box_score_thresh, max_n=max_n, progress=progress)
         for idx in range(len(inputs)):
             if max_n is not None:
                 if idx >= max_n: break
