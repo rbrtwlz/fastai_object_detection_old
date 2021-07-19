@@ -11,9 +11,9 @@ __all__ = ['get_efficientdet_model', 'efficientdet_d0', 'efficientdet_d1', 'effi
 class EffDetModelWrapper(nn.Module):
     def __init__(self, num_classes, compound_coef=0, pretrained=True, pretrained_backbone=True, 
                  nms_score_thresh=0.05, nms_iou_thresh=0.50, ratios='[(1.0,1.0),(1.4,0.7),(0.7,1.4)]', 
-                 scales='[2**0, 2**(1.0/3.0), 2**(2.0/3.0)]', **kwargs):
+                 scales='[2**0, 2**(1.0/3.0), 2**(2.0/3.0)]', focal_loss_alpha=0.25, focal_loss_gamma=2.0, **kwargs):
         super().__init__()
-        self.criterion = FocalLoss()
+        self.criterion = FocalLoss(alpha=focal_loss_alpha, gamma=focal_loss_gamma)
         self.model = EfficientDetBackbone(num_classes=num_classes, compound_coef=compound_coef, ratios=eval(ratios), scales=eval(scales))
         self.model.train()
 
@@ -111,10 +111,10 @@ effdet_model_urls = {
 }
 
 
-def get_efficientdet_model(num_classes, compound_coef=0, pretrained_backbone=True, pretrained=True, nms_score_thresh=0.05, nms_iou_thresh=0.50 , **kwargs):
+def get_efficientdet_model(num_classes, compound_coef=0, pretrained_backbone=True, pretrained=True, nms_score_thresh=0.05, nms_iou_thresh=0.50 , focal_loss_alpha=0.25, focal_loss_gamma=2.0, **kwargs):
 
     arch_str = f"efficientdet-d{compound_coef}"
-    model = EffDetModelWrapper(num_classes=num_classes, compound_coef=compound_coef, nms_score_thresh=nms_score_thresh, nms_iou_thresh=nms_iou_thresh, **kwargs)
+    model = EffDetModelWrapper(num_classes=num_classes, compound_coef=compound_coef, nms_score_thresh=nms_score_thresh, nms_iou_thresh=nms_iou_thresh, focal_loss_alpha=focal_loss_alpha, focal_loss_gamma=focal_loss_gamma, **kwargs)
 
     if pretrained or pretrained_backbone:
         try:
