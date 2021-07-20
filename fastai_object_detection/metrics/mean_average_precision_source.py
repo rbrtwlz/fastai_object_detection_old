@@ -60,15 +60,15 @@ class AdapterBase:
     def _check_empty(self, preds, gt):
         """ Check empty arguments
         Arguments:
-            preds (np.array): predicted boxes.
-            gt (np.array): ground truth boxes.
+            preds (torch.tensor): predicted boxes.
+            gt (torch.tensor): ground truth boxes.
         Returns:
-            preds (np.array): predicted boxes.
-            gt (np.array): ground truth boxes.
+            preds (torch.tensor): predicted boxes.
+            gt (torch.tensor): ground truth boxes.
         """
-        if not preds.size:
+        if preds.numel()==0:
             preds = torch.zeros((0, 6))
-        if not gt.size:
+        if gt.numel()==0:
             gt = torch.zeros((0, 7))
         return preds, gt
 
